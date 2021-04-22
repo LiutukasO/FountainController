@@ -1,3 +1,5 @@
+//#define IN_DEBUG_MODE
+
 #include <audioSpectrumAnalyzer.h>
 #include <fountain.h>
 
@@ -6,21 +8,30 @@
 
 fountain_state fountainState;
 
+void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t espStatus){
+  #ifdef IN_DEBUG_MODE
+    Serial.print("Packet Send Status:\t");
+    Serial.println(espStatus == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
+  #endif
+}
+
 void updateFountainState(fountain_state fountainState){
-  Serial.println("\r\nSending... ");
-  printFountainState(fountainState);
+  #ifdef IN_DEBUG_MODE
+    Serial.println("\r\nSending... ");
+    printFountainState(fountainState);
+  #endif
   esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
 }
 
-void setup()
-{
+void setup(){
   Serial.begin(115200);
   Serial.println("Fountain manager initializing...");
+  Serial.print("ESP Board MAC Address:  ");
+  Serial.println(WiFi.macAddress());
 
   WiFi.mode(WIFI_STA);
 
-  if (esp_now_init() != ESP_OK)
-  {
+  if (esp_now_init() != ESP_OK){
     Serial.println("Error initializing connection!");
     return;
   }
@@ -33,8 +44,7 @@ void setup()
   peerInfo.channel = 0;
   peerInfo.encrypt = false;
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
-  {
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
     return;
   }
@@ -62,7 +72,9 @@ void updateState(fountain_state state, char position, int value){
   } else {
     state.valves &= ~(1 << position);
   }
-  printFountainState(state);
+  #ifdef IN_DEBUG_MODE
+    printFountainState(state);
+  #endif
 }
 
 fountain_state makeFountainStatus(){
@@ -83,9 +95,17 @@ fountain_state makeFountainStatus(){
   return state;
 }
 
-void loop() {
-  makeSamples();
-  transformSamples();
-  fountainState = makeFountainStatus();
+fountain_state getDemoState(){
+  fountain_state demoState;
+  demoState.leds = rand();
+  demoState.valves = rand();
+  return demoState;
+}
+
+void loop(){
+  //makeSamples();
+  //transformSamples();
+  //fountainState = makeFountainStatus();
+  fountainState = getDemoState();
   updateFountainState(fountainState);
 }

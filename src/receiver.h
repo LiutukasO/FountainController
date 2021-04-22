@@ -1,3 +1,5 @@
+//#define IN_DEBUG_MODE
+
 #include <fountain.h>
 
 fountain_state fountainState;
@@ -10,7 +12,9 @@ bool exctractByte(unsigned long int bytes, unsigned char position){
 }
 
 void updateValveStatus(unsigned long int valvesState){
+  #ifdef IN_DEBUG_MODE
   Serial.print("\tValvesState: "); Serial.println(valvesState, BIN);
+  #endif
   for (unsigned char i=0; i < 8; i++){
     bool state = exctractByte(valvesState, i);
     //Serial.print("\tstate["); Serial.print(i, DEC); Serial.print("]: "); Serial.println(state, BIN);
@@ -19,7 +23,9 @@ void updateValveStatus(unsigned long int valvesState){
 }
 
 void updateLedStatus(unsigned long int ledsState){
+  #ifdef IN_DEBUG_MODE
   Serial.print("\tLedState: "); Serial.println(ledsState, BIN);
+  #endif
   for (unsigned char i=0; i < 8; i++){
     bool state = exctractByte(ledsState, i);
     //Serial.print("\tstate["); Serial.print(i, DEC); Serial.print("]: "); Serial.println(state, BIN);
@@ -27,8 +33,14 @@ void updateLedStatus(unsigned long int ledsState){
   }
 }
 
-void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  Serial.println("\r\nReceived: ");
+void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  #ifdef IN_DEBUG_MODE
+    char macStr[18];
+    snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    Serial.print("\n\rPacket from: ");
+    Serial.print(macStr);
+    Serial.print("\r\nReceived: ");
+  #endif
   memcpy(&fountainState, incomingData, sizeof(fountainState));
   updateValveStatus(fountainState.valves);
   updateLedStatus(fountainState.leds);
@@ -37,6 +49,8 @@ void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 void setup() {
   Serial.begin(115200);
   Serial.println("Fountain LED & valve controller initializing...");
+  Serial.print("ESP Board MAC Address:  ");
+  Serial.println(WiFi.macAddress());
 
   WiFi.mode(WIFI_STA);
 
