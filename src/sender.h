@@ -1,31 +1,44 @@
-//#define IN_DEBUG_MODE
+#include <esp_now.h>
+#include <WiFi.h>
+#include <parameters.h>
+#include <entity/FountainManager.h>
 
-#include <audioSpectrumAnalyzer.h>
-#include <fountain.h>
+#define IN_DEBUG_MODE
 
-#define ledTreshold 25
-#define valveTreshold 15
-
-fountain_state fountainState;
+unsigned long fountainStateTime = 0;
+FountainManager fountainManager = FountainManager(audioInputPin);
 
 void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t espStatus){
   #ifdef IN_DEBUG_MODE
     Serial.print("Packet Send Status:\t");
     Serial.println(espStatus == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
   #endif
+  // TODO: update Connection Status LED (RED/GREEN)
+  if (espStatus == ESP_NOW_SEND_SUCCESS){
+    fountainStateTime = millis();
+  }
 }
 
 void updateFountainState(fountain_state fountainState){
   #ifdef IN_DEBUG_MODE
     Serial.println("\r\nSending... ");
-    printFountainState(fountainState);
+    Fountain::printFountainState(fountainState);
   #endif
   esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
+}
+
+fountain_state showDemo(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\tFountain::showDemo()");
+    #endif
+    if (fountainStateTime + 1000 > millis()) return;
+    updateFountainState(Fountain::getDemoFountainState());
 }
 
 void setup(){
   Serial.begin(115200);
   Serial.println("Fountain manager initializing...");
+  // TODO: update Initialization Status LED to RED
   Serial.print("ESP Board MAC Address:  ");
   Serial.println(WiFi.macAddress());
 
@@ -49,63 +62,15 @@ void setup(){
     return;
   }
 
-  sampling_period_us = round(1000000 * (1.0 / SAMPLING_FREQUENCY));
+  // TODO: update Initialization Status LED to GREEN
   Serial.println("Fountain manager initialized");
 }
 
-bool getState(int value, int threshold){
-  int dmax = 50;
-  value /= amplitude;
-  if (value > dmax) value = dmax;
-  return value > threshold;
-}
-
-
-void updateState(fountain_state state, char position, int value){
-  if (getState(value, ledTreshold)){
-    state.leds |= 1 << position;
-  } else {
-    state.leds &= ~(1 << position);
-  }
-  if (getState(value, valveTreshold)){
-    state.valves |= 1 << position;
-  } else {
-    state.valves &= ~(1 << position);
-  }
-  #ifdef IN_DEBUG_MODE
-    printFountainState(state);
-  #endif
-}
-
-fountain_state makeFountainStatus(){
-  fountain_state state;
-  for (int i = 2; i < (SAMPLES/2); i++){ // Don't use sample 0 and only the first SAMPLES/2 are usable.
-    // Each array element represents a frequency and its value, is the amplitude. Note the frequencies are not discrete.
-    if (vReal[i] > 1500) { // Add a crude noise filter, 10 x amplitude or more
-      if (i<=2 )             updateState(state, 0, (int)vReal[i]); // 125Hz
-      if (i >2   && i<=4 )   updateState(state, 1, (int)vReal[i]); // 250Hz
-      if (i >4   && i<=7 )   updateState(state, 2, (int)vReal[i]); // 500Hz
-      if (i >7   && i<=15 )  updateState(state, 3, (int)vReal[i]); // 1000Hz
-      if (i >15  && i<=40 )  updateState(state, 4, (int)vReal[i]); // 2000Hz
-      if (i >40  && i<=70 )  updateState(state, 5, (int)vReal[i]); // 4000Hz
-      if (i >70  && i<=288 ) updateState(state, 6, (int)vReal[i]); // 8000Hz
-      if (i >288           ) updateState(state, 7, (int)vReal[i]); // 16000Hz
-    }
-  }
-  return state;
-}
-
-fountain_state getDemoState(){
-  fountain_state demoState;
-  demoState.leds = rand();
-  demoState.valves = rand();
-  return demoState;
-}
-
 void loop(){
-  //makeSamples();
-  //transformSamples();
-  //fountainState = makeFountainStatus();
-  fountainState = getDemoState();
-  updateFountainState(fountainState);
+  // TODO: setup trigers for FountainManager's buttons
+  if (fountainManager.isAudioConnected()){
+    updateFountainState(fountainManager.getFountainStateFromAudio());
+    return;
+  }
+  showDemo();
 }
