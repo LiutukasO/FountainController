@@ -1,6 +1,5 @@
 #include <entity/Fountain.h>
 #include <Arduino.h>
-#include <parameters.h>
 
 //#define IN_DEBUG_MODE
 
@@ -121,10 +120,10 @@ fountain_state Fountain::getDemoFountainState(){
 }
 
 void Fountain::showDemo(){
+    if (updateTime + 1000 > millis()) return;
     #ifdef IN_DEBUG_MODE
         Serial.println("\tFountain::showDemo()");
     #endif
-    if (updateTime + 1000 > millis()) return;
     this->updateState(Fountain::getDemoFountainState());
 }
 

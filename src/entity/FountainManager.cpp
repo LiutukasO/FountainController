@@ -1,12 +1,17 @@
 
 #include <entity/FountainManager.h>
 
+
 FountainManager::FountainManager(unsigned char audioPin){
     this->audioAnalyzer = new AudioAnalyzer(audioPin);
 }
 
 unsigned long FountainManager::getUpdateTime(){
     return this->updateTime;
+}
+
+bool FountainManager::isAudioConnected(){
+    return this->audioConnected;
 }
 
 void FountainManager::audioConnect(){

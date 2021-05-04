@@ -37,7 +37,7 @@ void Led::flush(){
     #endif
     digitalWrite(powerPin, HIGH);
     *this->needToFlush = false;
-    delay(1);
+    delay(5);
     digitalWrite(powerPin, LOW);
 }
 

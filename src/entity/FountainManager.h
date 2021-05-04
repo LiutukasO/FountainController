@@ -10,9 +10,9 @@ class FountainManager
         FountainManager (unsigned char audioPin);
 
         unsigned long getUpdateTime();
-        bool isAudioConnected();
         fountain_state getFountainStateFromAudio();
 
+        bool isAudioConnected();
         void audioConnect();
         void audioDisconnect();
 

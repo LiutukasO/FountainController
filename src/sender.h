@@ -27,11 +27,11 @@ void updateFountainState(fountain_state fountainState){
   esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
 }
 
-fountain_state showDemo(){
+void showDemo(){
+    if (fountainStateTime + 1000 > millis()) return;
     #ifdef IN_DEBUG_MODE
         Serial.println("\tFountain::showDemo()");
     #endif
-    if (fountainStateTime + 1000 > millis()) return;
     updateFountainState(Fountain::getDemoFountainState());
 }
 

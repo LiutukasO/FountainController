@@ -15,7 +15,7 @@ typedef struct fountain_state {
 class Fountain
 {
     public:
-        static void Fountain::printFountainState(fountain_state fountainState);
+        static void printFountainState(fountain_state fountainState);
         static fountain_state getDemoFountainState();
         Fountain (
               unsigned char valveCenterPin, unsigned char valveMiddlePin, unsigned char valveExternalPin
