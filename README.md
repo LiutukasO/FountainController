@@ -1,5 +1,17 @@
 # fountain-controller
-This controller control water valves and LEDs using multiple relays by received commands.
+The fountain has three controlled currents and 4 RGB LED groups. 4 Lamps in each group.
+All this is controlled by two modules: Receiver and Sender. They communicate over a WiFi connection.
+
+## Receiver
+Receiver control water valves and LEDs using multiple relays by received commands from "Sender".
+The Receiver can perform the Demo program on its own. Demo program automatically activating If 10 seconds does not receive data from the Sender module.
+
+## Sender
+Sender has multiple functions:
+* User can connect audio signal to this box. Program convert audio signal to LED & Valves statuses. Audio conversion will be done by [Furje transformation](https://en.wikipedia.org/wiki/Fourier_transform).
+* Turn On/Off Led lamps during day lighs
+* User can manually switch between different Demo program settings.
+
 
 ## Connections diagram
 
