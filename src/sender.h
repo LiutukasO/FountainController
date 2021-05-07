@@ -3,9 +3,13 @@
 #include <parameters.h>
 #include <entity/FountainManager.h>
 
-#define IN_DEBUG_MODE
+//#define IN_DEBUG_MODE
 
-unsigned long fountainStateTime = 0;
+volatile unsigned long meter = 0;
+volatile unsigned long meterTime = 0;
+
+volatile unsigned long fountainStateTime = 0;
+
 FountainManager fountainManager = FountainManager(audioInputPin);
 
 void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t espStatus){
@@ -13,9 +17,9 @@ void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t espStatus){
     Serial.print("Packet Send Status:\t");
     Serial.println(espStatus == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
   #endif
-  // TODO: update Connection Status LED (RED/GREEN)
   if (espStatus == ESP_NOW_SEND_SUCCESS){
-    fountainStateTime = millis();
+  // TODO: update Connection Status LED (RED/GREEN)
+    meter++;
   }
 }
 
@@ -24,15 +28,24 @@ void updateFountainState(fountain_state fountainState){
     Serial.println("\r\nSending... ");
     Fountain::printFountainState(fountainState);
   #endif
+  fountainStateTime = millis();
   esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
 }
 
 void showDemo(){
-    if (fountainStateTime + 1000 > millis()) return;
+    if (fountainStateTime + demoUpdateInterval > millis()) return;
     #ifdef IN_DEBUG_MODE
         Serial.println("\tFountain::showDemo()");
     #endif
     updateFountainState(Fountain::getDemoFountainState());
+}
+
+void processMeter(){
+  if (meterTime + 10000 > millis()) return;
+  Serial.print("10s Meter: ");
+  Serial.println(meter, DEC);
+  meterTime = millis();
+  meter = 0;
 }
 
 void setup(){
@@ -67,6 +80,7 @@ void setup(){
 }
 
 void loop(){
+  processMeter();
   // TODO: setup trigers for FountainManager's buttons
   if (fountainManager.isAudioConnected()){
     updateFountainState(fountainManager.getFountainStateFromAudio());

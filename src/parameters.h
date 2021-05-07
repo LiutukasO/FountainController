@@ -41,6 +41,7 @@ unsigned char led3Pins[]  = {led3RedPin, led3GreenPin, led3BluePin};
 unsigned char led4Pins[]  = {led4RedPin, led4GreenPin, led4BluePin};
 
 unsigned long iddleTimeToDemo = 10000; // 10s
+unsigned long demoUpdateInterval = 1000; // 1s
 
 unsigned char audioInputPin = 14;
 

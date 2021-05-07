@@ -55,8 +55,8 @@ void Led::turnOnRed(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOnRed()");
     #endif
-    if (digitalRead(this->redPin) == HIGH) return;
-    digitalWrite(redPin, HIGH);
+    if (digitalRead(this->redPin) == LOW) return;
+    digitalWrite(redPin, LOW);
     this->updateTime = millis();
 }
 
@@ -64,8 +64,8 @@ void Led::turnOffRed(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOffRed()");
     #endif
-    if (digitalRead(this->redPin) == LOW) return;
-    digitalWrite(redPin, LOW);
+    if (digitalRead(this->redPin) == HIGH) return;
+    digitalWrite(redPin, HIGH);
     this->updateTime = millis();
     *this->needToFlush = true;
 }
@@ -75,10 +75,10 @@ void Led::togleRed(){
         Serial.println("\t\tLed::togleRed()");
     #endif
     if (digitalRead(this->redPin)){
-        digitalWrite(redPin, LOW);
+        digitalWrite(redPin, HIGH);
         *this->needToFlush = true;
     } else {
-        digitalWrite(redPin, HIGH);
+        digitalWrite(redPin, LOW);
     }
     this->updateTime = millis();
 }
@@ -97,8 +97,8 @@ void Led::turnOnGreen(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOnGreen()");
     #endif
-    if (digitalRead(this->greenPin) == HIGH) return;
-    digitalWrite(greenPin, HIGH);
+    if (digitalRead(this->greenPin) == LOW) return;
+    digitalWrite(greenPin, LOW);
     this->updateTime = millis();
 }
 
@@ -106,8 +106,8 @@ void Led::turnOffGreen(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOffGreen()");
     #endif
-    if (digitalRead(this->greenPin) == LOW) return;
-    digitalWrite(greenPin, LOW);
+    if (digitalRead(this->greenPin) == HIGH) return;
+    digitalWrite(greenPin, HIGH);
     this->updateTime = millis();
     *this->needToFlush = true;
 }
@@ -117,10 +117,10 @@ void Led::togleGreen(){
         Serial.println("\t\tLed::togleGreen()");
     #endif
     if (digitalRead(this->greenPin)){
-        digitalWrite(greenPin, LOW);
+        digitalWrite(greenPin, HIGH);
         *this->needToFlush = true;
     } else {
-        digitalWrite(greenPin, HIGH);
+        digitalWrite(greenPin, LOW);
     }
     this->updateTime = millis();
 }
@@ -139,8 +139,8 @@ void Led::turnOnBlue(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOnBlue()");
     #endif
-    if (digitalRead(this->bluePin) == HIGH) return;
-    digitalWrite(bluePin, HIGH);
+    if (digitalRead(this->bluePin) == LOW) return;
+    digitalWrite(bluePin, LOW);
     this->updateTime = millis();
 }
 
@@ -148,8 +148,8 @@ void Led::turnOffBlue(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tLed::turnOffBlue()");
     #endif
-    if (digitalRead(this->bluePin) == LOW) return;
-    digitalWrite(bluePin, LOW);
+    if (digitalRead(this->bluePin) == HIGH) return;
+    digitalWrite(bluePin, HIGH);
     this->updateTime = millis();
     *this->needToFlush = true;
 }
@@ -159,10 +159,10 @@ void Led::togleBlue(){
         Serial.println("\t\tLed::togleBlue()");
     #endif
     if (digitalRead(this->bluePin)){
-        digitalWrite(bluePin, LOW);
+        digitalWrite(bluePin, HIGH);
         *this->needToFlush = true;
     } else {
-        digitalWrite(bluePin, HIGH);
+        digitalWrite(bluePin, LOW);
     }
     this->updateTime = millis();
 }

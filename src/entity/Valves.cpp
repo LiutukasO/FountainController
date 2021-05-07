@@ -46,18 +46,18 @@ void Valves::turnOnCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnCenter()");
     #endif
-    if (digitalRead(centerPin) == HIGH) return;
+    if (digitalRead(centerPin) == LOW) return;
     this->updateTime = millis();
-    digitalWrite(centerPin, HIGH);
+    digitalWrite(centerPin, LOW);
 }
 
 void Valves::turnOffCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffCenter()");
     #endif
-    if (digitalRead(centerPin) == LOW) return;
+    if (digitalRead(centerPin) == HIGH) return;
     this->updateTime = millis();
-    digitalWrite(centerPin, LOW);
+    digitalWrite(centerPin, HIGH);
 }
 
 void Valves::togleCenter(){
@@ -82,18 +82,18 @@ void Valves::turnOnMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnMiddle()");
     #endif
-    if (digitalRead(middlePin) == HIGH) return;
+    if (digitalRead(middlePin) == LOW) return;
     this->updateTime = millis();
-    digitalWrite(middlePin, HIGH);
+    digitalWrite(middlePin, LOW);
 }
 
 void Valves::turnOffMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffMiddle()");
     #endif
-    if (digitalRead(middlePin) == LOW) return;
+    if (digitalRead(middlePin) == HIGH) return;
     this->updateTime = millis();
-    digitalWrite(middlePin, LOW);
+    digitalWrite(middlePin, HIGH);
 }
 
 void Valves::togleMiddle(){
@@ -118,18 +118,18 @@ void Valves::turnOnExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnExternal()");
     #endif
-    if (digitalRead(externalPin) == HIGH) return;
+    if (digitalRead(externalPin) == LOW) return;
     this->updateTime = millis();
-    digitalWrite(externalPin, HIGH);
+    digitalWrite(externalPin, LOW);
 }
 
 void Valves::turnOffExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffExternal()");
     #endif
-    if (digitalRead(externalPin) == LOW) return;
+    if (digitalRead(externalPin) == HIGH) return;
     this->updateTime = millis();
-    digitalWrite(externalPin, LOW);
+    digitalWrite(externalPin, HIGH);
 }
 
 void Valves::togleExternal(){
