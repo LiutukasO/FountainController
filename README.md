@@ -9,6 +9,7 @@ This controller control water valves and LEDs using multiple relays by received 
 |  D13  |    R3   |   H2O 2   | 12V - Inner valve    |
 |  D15  |    R4   |   H2O 1   | 12V - Center valve   |
 
+
 | ESP32 | Bottom 8 SSR | Connector |    Wired     | Description |
 |-------|--------------|-----------|--------------|-------------|
 |       |      R1      |           |              |             |
@@ -22,6 +23,7 @@ This controller control water valves and LEDs using multiple relays by received 
 |  D22  |      R7      |   1LED 2  |  0V - Green  |  External   |
 |  D33  |      R8      |   1LED 3  |  0V - Blue   |  External   |
 |       |              |   1LED 4  | 12V - Power  |  External   |
+
 
 | ESP32 |  Top 8 SSR   | Connector |    Wired     | Description |
 |----------------------|-----------|--------------|-------------|
