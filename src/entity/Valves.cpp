@@ -1,6 +1,8 @@
 #include <entity/Valves.h>
 #include <Arduino.h>
 
+#define RELAY_ON 0x0
+#define RELAY_OFF 0x1
 //#define IN_DEBUG_MODE
 
 Valves::Valves (unsigned char centerPin, unsigned char middlePin, unsigned char externalPin){
@@ -25,8 +27,8 @@ valve_state Valves::getState(){
         Serial.println("\t\tValves::getState()");
     #endif
     valve_state valveState;
-    valveState.center = digitalRead(centerPin);
-    valveState.middle = digitalRead(middlePin);
+    valveState.center   = digitalRead(centerPin);
+    valveState.middle   = digitalRead(middlePin);
     valveState.external = digitalRead(externalPin);
     return valveState;
 }
@@ -39,25 +41,25 @@ bool Valves::isOnCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::isOnCenter()");
     #endif
-    return digitalRead(centerPin);
+    return digitalRead(centerPin) == RELAY_ON;
 }
 
 void Valves::turnOnCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnCenter()");
     #endif
-    if (digitalRead(centerPin) == LOW) return;
+    if (digitalRead(centerPin) == RELAY_ON) return;
     this->updateTime = millis();
-    digitalWrite(centerPin, LOW);
+    digitalWrite(centerPin, RELAY_ON);
 }
 
 void Valves::turnOffCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffCenter()");
     #endif
-    if (digitalRead(centerPin) == HIGH) return;
+    if (digitalRead(centerPin) == RELAY_OFF) return;
     this->updateTime = millis();
-    digitalWrite(centerPin, HIGH);
+    digitalWrite(centerPin, RELAY_OFF);
 }
 
 void Valves::togleCenter(){
@@ -75,25 +77,25 @@ bool Valves::isOnMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::isOnMiddle()");
     #endif
-    return digitalRead(middlePin);
+    return digitalRead(middlePin) == RELAY_ON;
 }
 
 void Valves::turnOnMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnMiddle()");
     #endif
-    if (digitalRead(middlePin) == LOW) return;
+    if (digitalRead(middlePin) == RELAY_ON) return;
     this->updateTime = millis();
-    digitalWrite(middlePin, LOW);
+    digitalWrite(middlePin, RELAY_ON);
 }
 
 void Valves::turnOffMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffMiddle()");
     #endif
-    if (digitalRead(middlePin) == HIGH) return;
+    if (digitalRead(middlePin) == RELAY_OFF) return;
     this->updateTime = millis();
-    digitalWrite(middlePin, HIGH);
+    digitalWrite(middlePin, RELAY_OFF);
 }
 
 void Valves::togleMiddle(){
@@ -111,25 +113,25 @@ bool Valves::isOnExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::isOnExternal()");
     #endif
-    return digitalRead(externalPin);
+    return digitalRead(externalPin) == RELAY_ON;
 }
 
 void Valves::turnOnExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnExternal()");
     #endif
-    if (digitalRead(externalPin) == LOW) return;
+    if (digitalRead(externalPin) == RELAY_ON) return;
     this->updateTime = millis();
-    digitalWrite(externalPin, LOW);
+    digitalWrite(externalPin, RELAY_ON);
 }
 
 void Valves::turnOffExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffExternal()");
     #endif
-    if (digitalRead(externalPin) == HIGH) return;
+    if (digitalRead(externalPin) == RELAY_OFF) return;
     this->updateTime = millis();
-    digitalWrite(externalPin, HIGH);
+    digitalWrite(externalPin, RELAY_OFF);
 }
 
 void Valves::togleExternal(){
