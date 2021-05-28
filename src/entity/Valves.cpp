@@ -1,18 +1,26 @@
 #include <entity/Valves.h>
 #include <Arduino.h>
 
-#define RELAY_ON 0x0
-#define RELAY_OFF 0x1
 //#define IN_DEBUG_MODE
 
-Valves::Valves (unsigned char centerPin, unsigned char middlePin, unsigned char externalPin){
+Valves::Valves (unsigned char channelGroup, unsigned char centerPin, unsigned char middlePin, unsigned char externalPin){
     this->centerPin = centerPin;
-    this->middlePin = middlePin;
-    this->externalPin = externalPin;
+    this->centerChannel = channelGroup + 1;
+    this->centerState = MIN_DUTY_CYCLE;
+    ledcAttachPin(this->centerPin, this->centerChannel);
+    ledcSetup(this->centerChannel, PWM_FREQ, this->centerState);
 
-    pinMode(this->centerPin, OUTPUT);
-    pinMode(this->middlePin, OUTPUT);
-    pinMode(this->externalPin, OUTPUT);
+    this->middlePin = middlePin;
+    this->middleChannel = channelGroup + 2;
+    this->middleState = MIN_DUTY_CYCLE;
+    ledcAttachPin(this->middlePin, this->middleChannel);
+    ledcSetup(this->middleChannel, PWM_FREQ, this->middleState);
+
+    this->externalPin = externalPin;
+    this->externalChannel = channelGroup + 3;
+    this->externalState = MIN_DUTY_CYCLE;
+    ledcAttachPin(this->externalPin, this->externalChannel);
+    ledcSetup(this->externalChannel, PWM_FREQ, this->externalState);
 }
 
 unsigned long Valves::getUpdateTime(){
@@ -27,9 +35,9 @@ valve_state Valves::getState(){
         Serial.println("\t\tValves::getState()");
     #endif
     valve_state valveState;
-    valveState.center   = digitalRead(centerPin);
-    valveState.middle   = digitalRead(middlePin);
-    valveState.external = digitalRead(externalPin);
+    valveState.center   = this->centerState;
+    valveState.middle   = this->middleState;
+    valveState.external = this->externalState;
     return valveState;
 }
 
@@ -37,107 +45,143 @@ valve_state Valves::getState(){
 // **************
 // *** CENTER ***
 // **************
-bool Valves::isOnCenter(){
+void Valves::setCenterState(unsigned char state){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::isOnCenter()");
+        Serial.printf("\t\tValves::setCenterState(%d)\n", state);
     #endif
-    return digitalRead(centerPin) == RELAY_ON;
+    this->centerState = state;
+    ledcWrite(this->centerChannel, state);
+    this->updateTime = millis();
+}
+
+bool Valves::isCenterOn(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::isCenterOn()");
+    #endif
+    return this->centerState > MID_DUTY_CYCLE;
 }
 
 void Valves::turnOnCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnCenter()");
     #endif
-    if (digitalRead(centerPin) == RELAY_ON) return;
+    if (this->centerState == MAX_DUTY_CYCLE) return;
+    this->centerState = MAX_DUTY_CYCLE;
+    ledcWrite(this->centerChannel, MAX_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(centerPin, RELAY_ON);
 }
 
 void Valves::turnOffCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffCenter()");
     #endif
-    if (digitalRead(centerPin) == RELAY_OFF) return;
+    if (this->centerState == MIN_DUTY_CYCLE) return;
+    this->centerState = MIN_DUTY_CYCLE;
+    ledcWrite(this->centerChannel, MIN_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(centerPin, RELAY_OFF);
 }
 
 void Valves::togleCenter(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::togleCenter()");
     #endif
+    this->centerState = 255 - this->centerState;
+    ledcWrite(this->centerChannel, this->centerState);
     this->updateTime = millis();
-    digitalWrite(centerPin, !digitalRead(centerPin));
 }
 
 // **************
 // *** MIDDLE ***
 // **************
-bool Valves::isOnMiddle(){
+void Valves::setMiddleState(unsigned char state){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::isOnMiddle()");
+        Serial.printf("\t\tValves::setMiddleState(%d)\n", state);
     #endif
-    return digitalRead(middlePin) == RELAY_ON;
+    this->middleState = state;
+    ledcWrite(this->middleChannel, state);
+    this->updateTime = millis();
+}
+
+bool Valves::isMiddleOn(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::isMiddleOn()");
+    #endif
+    return this->middleState > MID_DUTY_CYCLE;
 }
 
 void Valves::turnOnMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnMiddle()");
     #endif
-    if (digitalRead(middlePin) == RELAY_ON) return;
+    if (this->middleState == MAX_DUTY_CYCLE) return;
+    this->middleState = MAX_DUTY_CYCLE;
+    ledcWrite(this->middleChannel, MAX_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(middlePin, RELAY_ON);
 }
 
 void Valves::turnOffMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffMiddle()");
     #endif
-    if (digitalRead(middlePin) == RELAY_OFF) return;
+    if (this->middleState == MIN_DUTY_CYCLE) return;
+    this->middleState = MIN_DUTY_CYCLE;
+    ledcWrite(this->middleChannel, MIN_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(middlePin, RELAY_OFF);
 }
 
 void Valves::togleMiddle(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::togleMiddle()");
     #endif
+    this->middleState = 255 - this->middleState;
+    ledcWrite(this->middleChannel, this->middleState);
     this->updateTime = millis();
-    digitalWrite(middlePin, !digitalRead(middlePin));
 }
 
 // ****************
 // *** EXTERNAL ***
 // ****************
-bool Valves::isOnExternal(){
+void Valves::setExternalState(unsigned char state){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::isOnExternal()");
+        Serial.printf("\t\tValves::setExternalState(%d)\n", state);
     #endif
-    return digitalRead(externalPin) == RELAY_ON;
+    this->externalState = state;
+    ledcWrite(this->externalChannel, state);
+    this->updateTime = millis();
+}
+
+bool Valves::isExternalOn(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::isExternalOn()");
+    #endif
+    return this->externalState > MID_DUTY_CYCLE;
 }
 
 void Valves::turnOnExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOnExternal()");
     #endif
-    if (digitalRead(externalPin) == RELAY_ON) return;
+    if (this->externalState == MAX_DUTY_CYCLE) return;
+    this->externalState = MAX_DUTY_CYCLE;
+    ledcWrite(this->externalChannel, MAX_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(externalPin, RELAY_ON);
 }
 
 void Valves::turnOffExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::turnOffExternal()");
     #endif
-    if (digitalRead(externalPin) == RELAY_OFF) return;
+    if (this->externalState == MIN_DUTY_CYCLE) return;
+    this->externalState = MIN_DUTY_CYCLE;
+    ledcWrite(this->externalChannel, MIN_DUTY_CYCLE);
     this->updateTime = millis();
-    digitalWrite(externalPin, RELAY_OFF);
 }
 
 void Valves::togleExternal(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\t\tValves::togleExternal()");
     #endif
+    this->externalState = 255 - this->externalState;
+    ledcWrite(this->externalChannel, this->externalChannel);
     this->updateTime = millis();
-    digitalWrite(externalPin, !digitalRead(externalPin));
 }

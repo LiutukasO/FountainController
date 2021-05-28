@@ -1,6 +1,7 @@
 #ifndef __FONTAIN_H__
 #define __FONTAIN_H__
 
+#include <Arduino.h>
 #include <entity/Led.h>
 #include <entity/Valves.h>
 
@@ -16,7 +17,9 @@ class Fountain
 {
     public:
         static void printFountainState(fountain_state fountainState);
+        static String toJson(fountain_state fountainState);
         static fountain_state getDemoFountainState();
+        static fountain_state fadeLeds(fountain_state fountainState);
         Fountain (
               unsigned char valveCenterPin, unsigned char valveMiddlePin, unsigned char valveExternalPin
             , unsigned char ledPowerPin
@@ -39,7 +42,7 @@ class Fountain
 
     private:
         unsigned long updateTime = 0;
-        bool needToFlushLeds = false;
+        unsigned long fadeTime = 0;
 
         Valves *valves;
         Led *led1;
@@ -49,7 +52,6 @@ class Fountain
 
         void updateValves(valve_state fountainState);
         void updateLeds(Led *led, led_state fountainState);
-        void flushLeds();
 };
 
 #endif

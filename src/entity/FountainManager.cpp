@@ -78,34 +78,34 @@ fountain_state FountainManager::getFountainStateFromAudio(){
     unsigned int middleLevel = this->getMiddleLevel(audioState);
     unsigned int trebleLevel = this->getTrebleLevel(audioState);
 
-    fountainState.valveState.center   = bossLevel   > FountainManager::WATER_AUDIO_LEVEL_FROM;
-    fountainState.valveState.middle   = middleLevel > FountainManager::WATER_AUDIO_LEVEL_FROM;
-    fountainState.valveState.external = trebleLevel > FountainManager::WATER_AUDIO_LEVEL_FROM;
+    fountainState.valveState.center   = bossLevel   > FountainManager::WATER_AUDIO_LEVEL_FROM ? 255 : 0;
+    fountainState.valveState.middle   = middleLevel > FountainManager::WATER_AUDIO_LEVEL_FROM ? 255 : 0;
+    fountainState.valveState.external = trebleLevel > FountainManager::WATER_AUDIO_LEVEL_FROM ? 255 : 0;
 
     if (fountainState.valveState.center){
-        fountainState.valveState.center = this->valvesTurnedOn;
+        fountainState.valveState.center = this->valvesTurnedOn ? 255 : 0;
         if (this->ledTurnedOn){
-            fountainState.led1State.red   = isBetween(bossLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO);
-            fountainState.led1State.green = isBetween(bossLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO);
-            fountainState.led1State.blue  = isBetween(bossLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO);
+            fountainState.led1State.red   = isBetween(bossLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led1State.green = isBetween(bossLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led1State.blue  = isBetween(bossLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO) ? 255 : 0;
         }
     }
 
     if (fountainState.valveState.middle){
-        fountainState.valveState.middle = this->valvesTurnedOn;
+        fountainState.valveState.middle = this->valvesTurnedOn ? 255 : 0;
         if (this->ledTurnedOn){
-            fountainState.led2State.red   = isBetween(middleLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO);
-            fountainState.led2State.green = isBetween(middleLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO);
-            fountainState.led2State.blue  = isBetween(middleLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO);
+            fountainState.led2State.red   = isBetween(middleLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led2State.green = isBetween(middleLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led2State.blue  = isBetween(middleLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO) ? 255 : 0;
         }
     }
 
     if (fountainState.valveState.external){
-        fountainState.valveState.external = this->valvesTurnedOn;
+        fountainState.valveState.external = this->valvesTurnedOn ? 255 : 0;
         if (this->ledTurnedOn){
-            fountainState.led3State.red   = isBetween(trebleLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO);
-            fountainState.led3State.green = isBetween(trebleLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO);
-            fountainState.led3State.blue  = isBetween(trebleLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO);
+            fountainState.led3State.red   = isBetween(trebleLevel, FountainManager::RED_AUDIO_LEVEL_FROM,   FountainManager::RED_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led3State.green = isBetween(trebleLevel, FountainManager::GREEN_AUDIO_LEVEL_FROM, FountainManager::GREEN_AUDIO_LEVEL_TO) ? 255 : 0;
+            fountainState.led3State.blue  = isBetween(trebleLevel, FountainManager::BLUE_AUDIO_LEVEL_FROM,  FountainManager::BLUE_AUDIO_LEVEL_TO) ? 255 : 0;
             
             fountainState.led4State.red   = fountainState.led3State.red;
             fountainState.led4State.green = fountainState.led3State.green;

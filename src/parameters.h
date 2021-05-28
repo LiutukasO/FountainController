@@ -1,7 +1,9 @@
 #ifndef __PARAMETERS_H__
 #define __PARAMETERS_H__
 
-//#define IN_DEBUG_MODE
+#include <parameters-wifi.h>
+
+#define IN_DEBUG_MODE
 
 //98:41:5c:03:f2:af
 //ac:67:b2:2b:0e:70
@@ -31,7 +33,7 @@ unsigned char led3BluePin  = 22;
 // MIDDLE
 unsigned char led4RedPin   = 4;
 unsigned char led4GreenPin = 5;
-unsigned char led4BluePin  = 8;
+unsigned char led4BluePin  = 2;
 
 
 unsigned char valvePins[] = {valveCenterPin, valveMiddlePin, valveExternalPin};

@@ -1,43 +1,60 @@
 #ifndef __LED_H__
 #define __LED_H__
 
+#include <math.h>
+
 typedef struct led_state {
-  bool red;
-  bool green;
-  bool blue;
+  unsigned char red;
+  unsigned char green;
+  unsigned char blue;
 } led_state;
 
 class Led
 {
     public:
-        Led (bool& needToFlush, unsigned char powerPin, unsigned char redPin, unsigned char greenPin, unsigned char bluePin);
+        Led (unsigned char channelGroup, unsigned char redPin, unsigned char greenPin, unsigned char bluePin);
 
         led_state getState();
-        void flush();
 
+        void setRedState(unsigned char state);
         bool isRedOn();
         void turnOnRed();
         void turnOffRed();
         void togleRed();
 
+        void setGreenState(unsigned char state);
         bool isGreenOn();
         void turnOnGreen();
         void turnOffGreen();
         void togleGreen();
 
+        void setBlueState(unsigned char state);
         bool isBlueOn();
         void turnOnBlue();
         void turnOffBlue();
         void togleBlue();
 
     private:
-        bool* needToFlush;
-        unsigned long updateTime = 0;
+        /* Setting PWM Properties */
+        const int PWM_FREQ = 5000; /* 5 KHz */
+        const unsigned char PWM_RESOLUTION = 8;
+        const unsigned char MAX_DUTY_CYCLE = (unsigned char)(pow(2, PWM_RESOLUTION) - 1);
+        const unsigned char MID_DUTY_CYCLE = MAX_DUTY_CYCLE / 2;
+        const unsigned char MIN_DUTY_CYCLE = 0;
 
-        unsigned char powerPin;
+        unsigned long updateTime;
+
         unsigned char redPin;
+        unsigned char redState;
+        unsigned char redChannel;
+
         unsigned char greenPin;
+        unsigned char greenState;
+        unsigned char greenChannel;
+
         unsigned char bluePin;
+        unsigned char blueState;
+        unsigned char blueChannel;
 
 };
 
