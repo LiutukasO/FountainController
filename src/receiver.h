@@ -20,13 +20,7 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     Serial.printf("\n\rPacket from: %s\n", macStr);
   #endif
-  if (  mac[0] != senderAddress[0]
-     || mac[1] != senderAddress[1]
-     || mac[2] != senderAddress[2]
-     || mac[3] != senderAddress[3]
-     || mac[4] != senderAddress[4]
-     || mac[5] != senderAddress[5]
-    ){
+  if (!isValidSender(mac)){
     #ifdef IN_DEBUG_MODE
       Serial.printf("\n\rWrong sender: %s\n", macStr);
     #endif
@@ -47,8 +41,8 @@ void setup() {
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+  if (WiFi.status() != WL_CONNECTED) {
+    delay(5000);
     Serial.println("Setting as a Wi-Fi Station..");
   }
   Serial.printf("Station IP Address: %s\n", WiFi.localIP().toString().c_str());
@@ -61,12 +55,11 @@ void setup() {
   
   Serial.println("Fountain initializing...");
   fountain = new Fountain(
-    valveCenterPin, valveMiddlePin, valveExternalPin
-  , ledPowerPin
-  , led1RedPin, led1GreenPin, led1BluePin
-  , led2RedPin, led2GreenPin, led2BluePin
-  , led3RedPin, led3GreenPin, led3BluePin
-  , led4RedPin, led4GreenPin, led4BluePin
+    valveChannelGroup
+  , led1ChannelGroup
+  , led2ChannelGroup
+  , led3ChannelGroup
+  , led4ChannelGroup
   );
   Serial.println("Fountain initialized.");
 

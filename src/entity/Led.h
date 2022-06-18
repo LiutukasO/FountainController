@@ -2,6 +2,7 @@
 #define __LED_H__
 
 #include <math.h>
+#include <dmx/ESPDMX.h>
 
 typedef struct led_state {
   unsigned char red;
@@ -12,7 +13,7 @@ typedef struct led_state {
 class Led
 {
     public:
-        Led (unsigned char channelGroup, unsigned char redPin, unsigned char greenPin, unsigned char bluePin);
+        Led (DMXESPSerial *dmx, unsigned char channelGroup);
 
         led_state getState();
 
@@ -44,17 +45,16 @@ class Led
 
         unsigned long updateTime;
 
-        unsigned char redPin;
-        unsigned char redState;
+        DMXESPSerial *dmx;
+
         unsigned char redChannel;
+        unsigned char redState;
 
-        unsigned char greenPin;
-        unsigned char greenState;
         unsigned char greenChannel;
+        unsigned char greenState;
 
-        unsigned char bluePin;
-        unsigned char blueState;
         unsigned char blueChannel;
+        unsigned char blueState;
 
 };
 

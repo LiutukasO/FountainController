@@ -6,9 +6,11 @@
 //#define IN_DEBUG_MODE
 
 volatile unsigned long meter = 0;
+volatile unsigned long meterSended = 0;
 volatile unsigned long meterTime = 0;
 
 volatile unsigned long fountainStateTime = 0;
+fountain_state fountainStateUpdated;
 
 FountainManager fountainManager = FountainManager(audioInputPin);
 
@@ -19,32 +21,91 @@ void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t espStatus){
   #endif
   if (espStatus == ESP_NOW_SEND_SUCCESS){
   // TODO: update Connection Status LED (RED/GREEN)
-    meter++;
+    meterSended++;
   }
+}
+
+bool changedFountainState(fountain_state fountainState) {
+  if (fountainStateUpdated.valveState.center != fountainState.valveState.center) return true;
+    //Serial.print("\n\t\tVALVE C");
+  if (fountainStateUpdated.valveState.ring1  != fountainState.valveState.ring1)  return true;
+    //Serial.print("\n\t\tVALVE R1");
+  if (fountainStateUpdated.valveState.ring2  != fountainState.valveState.ring2)  return true;
+    //Serial.print("\n\t\tVALVE R2");
+  if (fountainStateUpdated.valveState.ring3  != fountainState.valveState.ring3)  return true;
+    //Serial.print("\n\t\tVALVE R3");
+
+  if (fountainStateUpdated.led1State.red   != fountainState.led1State.red)   return true;
+    //Serial.print("\n\t\tLED1 R");
+  if (fountainStateUpdated.led1State.green != fountainState.led1State.green) return true;
+    //Serial.print("\n\t\tLED1 G");
+  if (fountainStateUpdated.led1State.blue  != fountainState.led1State.blue)  return true;
+    //Serial.print("\n\t\tLED1 B");
+
+  if (fountainStateUpdated.led2State.red   != fountainState.led2State.red)   return true;
+    //Serial.print("\n\t\tLED2 R");
+  if (fountainStateUpdated.led2State.green != fountainState.led2State.green) return true;
+    //Serial.print("\n\t\tLED2 G");
+  if (fountainStateUpdated.led2State.blue  != fountainState.led2State.blue)  return true;
+    //Serial.print("\n\t\tLED2 B");
+
+  if (fountainStateUpdated.led3State.red   != fountainState.led3State.red)   return true;
+    //Serial.print("\n\t\tLED3 R");
+  if (fountainStateUpdated.led3State.green != fountainState.led3State.green) return true;
+    //Serial.print("\n\t\tLED3 G");
+  if (fountainStateUpdated.led3State.blue  != fountainState.led3State.blue)  return true;
+    //Serial.print("\n\t\tLED3 B");
+  return false;
+}
+
+bool needToUpdateFountainState(fountain_state fountainState){
+  if (changedFountainState(fountainState)) {
+    #ifdef IN_DEBUG_MODE
+      Serial.print("Fountain State changed");
+    #endif
+    return true;
+  }
+  if (fountainStateTime + 10000 < millis()) {
+    #ifdef IN_DEBUG_MODE
+      Serial.print("Need to update Fountain State on Idle");
+    #endif
+    return true;
+  }
+  return false;
 }
 
 void updateFountainState(fountain_state fountainState){
   #ifdef IN_DEBUG_MODE
-    Serial.println("\r\nSending... ");
-    Fountain::printFountainState(fountainState);
+    Serial.println("\r\nupdateFountainState");
+  #endif
+  if (fountainStateTime + 20 > millis()) return;
+  if (!needToUpdateFountainState(fountainState)) return;
+  Fountain::printFountainState(fountainState);
+  #ifdef IN_DEBUG_MODE
+    Serial.println("\r\nSending...");
   #endif
   fountainStateTime = millis();
+  fountainStateUpdated = fountainState;
+  meter++;
   esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
+  #ifdef IN_DEBUG_MODE
+    Serial.println("\r\nSending completed!");
+  #endif
 }
 
 void showDemo(){
     if (fountainStateTime + demoUpdateInterval > millis()) return;
     #ifdef IN_DEBUG_MODE
-        Serial.println("\tFountain::showDemo()");
+        Serial.println("\tshowDemo()");
     #endif
     updateFountainState(Fountain::getDemoFountainState());
 }
 
 void processMeter(){
   if (meterTime + 10000 > millis()) return;
-  Serial.print("10s Meter: ");
-  Serial.println(meter, DEC);
+  Serial.printf("\n10s Meter: %d / %d", meterSended, meter);
   meterTime = millis();
+  meterSended = 0;
   meter = 0;
 }
 
@@ -81,10 +142,17 @@ void setup(){
 
 void loop(){
   processMeter();
-  // TODO: setup trigers for FountainManager's buttons
+  // TODO: setup trigers for FountainManager's Audio buttons
   if (fountainManager.isAudioConnected()){
     updateFountainState(fountainManager.getFountainStateFromAudio());
     return;
   }
+
+  // TODO: setup trigers for FountainManager's DMX buttons
+  if (fountainManager.isDmxConnected()) {
+    updateFountainState(fountainManager.getFountainStateFromDMX());
+    return;
+  }
+
   showDemo();
 }

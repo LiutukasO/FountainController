@@ -3,24 +3,31 @@
 
 //#define IN_DEBUG_MODE
 
-Valves::Valves (unsigned char channelGroup, unsigned char centerPin, unsigned char middlePin, unsigned char externalPin){
-    this->centerPin = centerPin;
-    this->centerChannel = channelGroup + 1;
+Valves::Valves (DMXESPSerial *dmx, unsigned char channelGroup){
+    this->dmx = dmx;
+
+    this->centerChannel = channelGroup + 0;
     this->centerState = MIN_DUTY_CYCLE;
-    ledcAttachPin(this->centerPin, this->centerChannel);
-    ledcSetup(this->centerChannel, PWM_FREQ, this->centerState);
+    this->dmx->write(this->centerChannel, this->centerState);
+    Serial.printf("\n\t\tCenter valve channel: %d", this->centerChannel);
 
-    this->middlePin = middlePin;
-    this->middleChannel = channelGroup + 2;
-    this->middleState = MIN_DUTY_CYCLE;
-    ledcAttachPin(this->middlePin, this->middleChannel);
-    ledcSetup(this->middleChannel, PWM_FREQ, this->middleState);
+    this->ring1Channel = channelGroup + 1;
+    this->ring1State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring1Channel, this->ring1State);
+    Serial.printf("\n\t\tRing1 valve channel: %d", this->ring1Channel);
 
-    this->externalPin = externalPin;
-    this->externalChannel = channelGroup + 3;
-    this->externalState = MIN_DUTY_CYCLE;
-    ledcAttachPin(this->externalPin, this->externalChannel);
-    ledcSetup(this->externalChannel, PWM_FREQ, this->externalState);
+    this->ring2Channel = channelGroup + 2;
+    this->ring2State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring2Channel, this->ring2State);
+    Serial.printf("\n\t\tRing2 valve channel: %d", this->ring2Channel);
+
+    this->ring3Channel = channelGroup + 3;
+    this->ring3State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring3Channel, this->ring3State);
+    Serial.printf("\n\t\tRing3 valve channel: %d", this->ring3Channel);
+
+    this->dmx->update();
+    this->updateTime = millis();
 }
 
 unsigned long Valves::getUpdateTime(){
@@ -35,9 +42,10 @@ valve_state Valves::getState(){
         Serial.println("\t\tValves::getState()");
     #endif
     valve_state valveState;
-    valveState.center   = this->centerState;
-    valveState.middle   = this->middleState;
-    valveState.external = this->externalState;
+    valveState.center = this->centerState;
+    valveState.ring1  = this->ring1State;
+    valveState.ring2  = this->ring2State;
+    valveState.ring3  = this->ring3State;
     return valveState;
 }
 
@@ -50,7 +58,8 @@ void Valves::setCenterState(unsigned char state){
         Serial.printf("\t\tValves::setCenterState(%d)\n", state);
     #endif
     this->centerState = state;
-    ledcWrite(this->centerChannel, state);
+    this->dmx->write(this->centerChannel, this->centerState);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -67,7 +76,8 @@ void Valves::turnOnCenter(){
     #endif
     if (this->centerState == MAX_DUTY_CYCLE) return;
     this->centerState = MAX_DUTY_CYCLE;
-    ledcWrite(this->centerChannel, MAX_DUTY_CYCLE);
+    this->dmx->write(this->centerChannel, this->centerState);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -77,7 +87,8 @@ void Valves::turnOffCenter(){
     #endif
     if (this->centerState == MIN_DUTY_CYCLE) return;
     this->centerState = MIN_DUTY_CYCLE;
-    ledcWrite(this->centerChannel, MIN_DUTY_CYCLE);
+    this->dmx->write(this->centerChannel, this->centerState);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -86,102 +97,163 @@ void Valves::togleCenter(){
         Serial.println("\t\tValves::togleCenter()");
     #endif
     this->centerState = 255 - this->centerState;
-    ledcWrite(this->centerChannel, this->centerState);
+    this->dmx->write(this->centerState, this->centerState);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
 // **************
-// *** MIDDLE ***
+// *** RING-1 ***
 // **************
-void Valves::setMiddleState(unsigned char state){
+void Valves::setRing1State(unsigned char state){
     #ifdef IN_DEBUG_MODE
-        Serial.printf("\t\tValves::setMiddleState(%d)\n", state);
+        Serial.printf("\t\tValves::setRing1State(%d)\n", state);
     #endif
-    this->middleState = state;
-    ledcWrite(this->middleChannel, state);
+    this->ring1State = state;
+    this->dmx->write(this->ring1Channel, this->ring1State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-bool Valves::isMiddleOn(){
+bool Valves::isRing1On(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::isMiddleOn()");
+        Serial.println("\t\tValves::isRing1On()");
     #endif
-    return this->middleState > MID_DUTY_CYCLE;
+    return this->ring1State > MID_DUTY_CYCLE;
 }
 
-void Valves::turnOnMiddle(){
+void Valves::turnOnRing1(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::turnOnMiddle()");
+        Serial.println("\t\tValves::turnOnRing1()");
     #endif
-    if (this->middleState == MAX_DUTY_CYCLE) return;
-    this->middleState = MAX_DUTY_CYCLE;
-    ledcWrite(this->middleChannel, MAX_DUTY_CYCLE);
+    if (this->ring1State == MAX_DUTY_CYCLE) return;
+    this->ring1State = MAX_DUTY_CYCLE;
+    this->dmx->write(this->ring1Channel, this->ring1State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-void Valves::turnOffMiddle(){
+void Valves::turnOffRing1(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::turnOffMiddle()");
+        Serial.println("\t\tValves::turnOffRing1()");
     #endif
-    if (this->middleState == MIN_DUTY_CYCLE) return;
-    this->middleState = MIN_DUTY_CYCLE;
-    ledcWrite(this->middleChannel, MIN_DUTY_CYCLE);
+    if (this->ring1State == MIN_DUTY_CYCLE) return;
+    this->ring1State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring1Channel, this->ring1State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-void Valves::togleMiddle(){
+void Valves::togleRing1(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::togleMiddle()");
+        Serial.println("\t\tValves::togleRing1()");
     #endif
-    this->middleState = 255 - this->middleState;
-    ledcWrite(this->middleChannel, this->middleState);
+    this->ring1State = 255 - this->ring1State;
+    this->dmx->write(this->ring1Channel, this->ring1State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-// ****************
-// *** EXTERNAL ***
-// ****************
-void Valves::setExternalState(unsigned char state){
+// **************
+// *** RING-2 ***
+// **************
+void Valves::setRing2State(unsigned char state){
     #ifdef IN_DEBUG_MODE
-        Serial.printf("\t\tValves::setExternalState(%d)\n", state);
+        Serial.printf("\t\tValves::setRing2State(%d)\n", state);
     #endif
-    this->externalState = state;
-    ledcWrite(this->externalChannel, state);
+    this->ring2State = state;
+    this->dmx->write(this->ring2Channel, this->ring2State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-bool Valves::isExternalOn(){
+bool Valves::isRing2On(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::isExternalOn()");
+        Serial.println("\t\tValves::isRing2On()");
     #endif
-    return this->externalState > MID_DUTY_CYCLE;
+    return this->ring2State > MID_DUTY_CYCLE;
 }
 
-void Valves::turnOnExternal(){
+void Valves::turnOnRing2(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::turnOnExternal()");
+        Serial.println("\t\tValves::turnOnRing2()");
     #endif
-    if (this->externalState == MAX_DUTY_CYCLE) return;
-    this->externalState = MAX_DUTY_CYCLE;
-    ledcWrite(this->externalChannel, MAX_DUTY_CYCLE);
+    if (this->ring2State == MAX_DUTY_CYCLE) return;
+    this->ring2State = MAX_DUTY_CYCLE;
+    this->dmx->write(this->ring2Channel, this->ring2State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-void Valves::turnOffExternal(){
+void Valves::turnOffRing2(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::turnOffExternal()");
+        Serial.println("\t\tValves::turnOffRing2()");
     #endif
-    if (this->externalState == MIN_DUTY_CYCLE) return;
-    this->externalState = MIN_DUTY_CYCLE;
-    ledcWrite(this->externalChannel, MIN_DUTY_CYCLE);
+    if (this->ring2State == MIN_DUTY_CYCLE) return;
+    this->ring2State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring2Channel, this->ring2State);
+    this->dmx->update();
     this->updateTime = millis();
 }
 
-void Valves::togleExternal(){
+void Valves::togleRing2(){
     #ifdef IN_DEBUG_MODE
-        Serial.println("\t\tValves::togleExternal()");
+        Serial.println("\t\tValves::togleRing2()");
     #endif
-    this->externalState = 255 - this->externalState;
-    ledcWrite(this->externalChannel, this->externalChannel);
+    this->ring2State = 255 - this->ring2State;
+    this->dmx->write(this->ring2Channel, this->ring2State);
+    this->dmx->update();
+    this->updateTime = millis();
+}
+
+// **************
+// *** RING-3 ***
+// **************
+void Valves::setRing3State(unsigned char state){
+    #ifdef IN_DEBUG_MODE
+        Serial.printf("\t\tValves::setRing3State(%d)\n", state);
+    #endif
+    this->ring3State = state;
+    this->dmx->write(this->ring3Channel, this->ring3State);
+    this->dmx->update();
+    this->updateTime = millis();
+}
+
+bool Valves::isRing3On(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::isRing3On()");
+    #endif
+    return this->ring3State > MID_DUTY_CYCLE;
+}
+
+void Valves::turnOnRing3(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::turnOnRing3()");
+    #endif
+    if (this->ring3State == MAX_DUTY_CYCLE) return;
+    this->ring3State = MAX_DUTY_CYCLE;
+    this->dmx->write(this->ring3Channel, this->ring3State);
+    this->dmx->update();
+    this->updateTime = millis();
+}
+
+void Valves::turnOffRing3(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::turnOffRing3()");
+    #endif
+    if (this->ring3State == MIN_DUTY_CYCLE) return;
+    this->ring3State = MIN_DUTY_CYCLE;
+    this->dmx->write(this->ring3Channel, this->ring3State);
+    this->dmx->update();
+    this->updateTime = millis();
+}
+
+void Valves::togleRing3(){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\t\tValves::togleRing3()");
+    #endif
+    this->ring3State = 255 - this->ring3State;
+    this->dmx->write(this->ring3Channel, this->ring3State);
+    this->dmx->update();
     this->updateTime = millis();
 }

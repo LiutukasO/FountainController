@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <entity/Led.h>
 #include <entity/Valves.h>
+#include <dmx/ESPDMX.h>
 
 typedef struct fountain_state {
   valve_state valveState;
@@ -21,12 +22,11 @@ class Fountain
         static fountain_state getDemoFountainState();
         static fountain_state fadeLeds(fountain_state fountainState);
         Fountain (
-              unsigned char valveCenterPin, unsigned char valveMiddlePin, unsigned char valveExternalPin
-            , unsigned char ledPowerPin
-            , unsigned char led1RedPin, unsigned char led1GreenPin, unsigned char led1BluePin
-            , unsigned char led2RedPin, unsigned char led2GreenPin, unsigned char led2BluePin
-            , unsigned char led3RedPin, unsigned char led3GreenPin, unsigned char led3BluePin
-            , unsigned char led4RedPin, unsigned char led4GreenPin, unsigned char led4BluePin
+              unsigned char valveChannelGroup
+            , unsigned char led1ChannelGroup
+            , unsigned char led2ChannelGroup
+            , unsigned char led3ChannelGroup
+            , unsigned char led4ChannelGroup
         );
 
         Valves * getValves();
@@ -49,6 +49,8 @@ class Fountain
         Led *led2;
         Led *led3;
         Led *led4;
+
+        DMXESPSerial dmx;
 
         void updateValves(valve_state fountainState);
         void updateLeds(Led *led, led_state fountainState);

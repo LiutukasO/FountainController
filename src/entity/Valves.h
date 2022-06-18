@@ -2,17 +2,19 @@
 #define __VALVES_H__
 
 #include <math.h>
+#include <dmx/ESPDMX.h>
 
 typedef struct valve_state {
   unsigned char center;
-  unsigned char middle;
-  unsigned char external;
+  unsigned char ring1;
+  unsigned char ring2;
+  unsigned char ring3;
 } valve_state;
 
 class Valves
 {
     public:
-        Valves (unsigned char channelGroup, unsigned char centerPin, unsigned char middlePin, unsigned char externalPin);
+        Valves (DMXESPSerial *dmx, unsigned char channelGroup);
 
         unsigned long getUpdateTime();
         valve_state getState();
@@ -23,17 +25,23 @@ class Valves
         void turnOffCenter();
         void togleCenter();
 
-        void setMiddleState(unsigned char state);
-        bool isMiddleOn();
-        void turnOnMiddle();
-        void turnOffMiddle();
-        void togleMiddle();
+        void setRing1State(unsigned char state);
+        bool isRing1On();
+        void turnOnRing1();
+        void turnOffRing1();
+        void togleRing1();
 
-        void setExternalState(unsigned char state);
-        bool isExternalOn();
-        void turnOnExternal();
-        void turnOffExternal();
-        void togleExternal();
+        void setRing2State(unsigned char state);
+        bool isRing2On();
+        void turnOnRing2();
+        void turnOffRing2();
+        void togleRing2();
+
+        void setRing3State(unsigned char state);
+        bool isRing3On();
+        void turnOnRing3();
+        void turnOffRing3();
+        void togleRing3();
 
     private:
         const int PWM_FREQ = 5000; /* 5 KHz */
@@ -44,17 +52,19 @@ class Valves
 
         unsigned long updateTime = 0;
 
-        unsigned char centerPin;
-        unsigned char centerState = MIN_DUTY_CYCLE;
+        DMXESPSerial *dmx;
+
         unsigned char centerChannel;
+        unsigned char centerState = MIN_DUTY_CYCLE;
 
-        unsigned char middlePin;
-        unsigned char middleState = MIN_DUTY_CYCLE;
-        unsigned char middleChannel;
+        unsigned char ring1Channel;
+        unsigned char ring1State = MIN_DUTY_CYCLE;
 
-        unsigned char externalPin;
-        unsigned char externalState = MIN_DUTY_CYCLE;
-        unsigned char externalChannel;
+        unsigned char ring2Channel;
+        unsigned char ring2State = MIN_DUTY_CYCLE;
+
+        unsigned char ring3Channel;
+        unsigned char ring3State = MIN_DUTY_CYCLE;
 
 };
 

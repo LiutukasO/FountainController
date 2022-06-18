@@ -3,6 +3,7 @@
 
 #include <entity/Fountain.h>
 #include <entity/AudioAnalyzer.h>
+#include <dmx/dmx.h>
 
 class FountainManager
 {
@@ -11,10 +12,15 @@ class FountainManager
 
         unsigned long getUpdateTime();
         fountain_state getFountainStateFromAudio();
+        fountain_state getFountainStateFromDMX();
 
         bool isAudioConnected();
         void audioConnect();
         void audioDisconnect();
+
+        bool isDmxConnected();
+        void dmxConnect();
+        void dmxDisconnect();
 
         void valvesTurnOn();
         void valvesTurnOff();
@@ -34,6 +40,8 @@ class FountainManager
         unsigned long updateTime = 0;
 
         bool audioConnected = false;
+        bool dmxConnected = true;
+
         bool ledTurnedOn = true;
         bool valvesTurnedOn = true;
 
@@ -41,6 +49,7 @@ class FountainManager
 
         unsigned int getBossLevel  (audio_state audioState);
         unsigned int getMiddleLevel(audio_state audioState);
+        unsigned int getHighLevel  (audio_state audioState);
         unsigned int getTrebleLevel(audio_state audioState);
         bool isBetween(unsigned int value, unsigned int fromValue, unsigned int toValue);
 
