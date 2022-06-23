@@ -1,5 +1,5 @@
 
-#include <entity/AudioAnalyzer.h>
+#include <service/AudioAnalyzer.h>
 
 //#define IN_DEBUG_MODE
 

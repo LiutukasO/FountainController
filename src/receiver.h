@@ -1,7 +1,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
-#include <entity/Fountain.h>
+#include <dto/fountain/Fountain.h>
 #include <parameters.h>
 #include <receiver_index.h>
 

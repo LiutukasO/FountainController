@@ -1,8 +1,8 @@
 #ifndef __FONTAIN_MANAGER_H__
 #define __FONTAIN_MANAGER_H__
 
-#include <entity/Fountain.h>
-#include <entity/AudioAnalyzer.h>
+#include <dto/fountain/Fountain.h>
+#include <service/AudioAnalyzer.h>
 #include <dmx/dmx.h>
 
 class FountainManager
