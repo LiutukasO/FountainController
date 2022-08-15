@@ -3,7 +3,7 @@
 #include <parameters.h>
 #include <entity/FountainManager.h>
 
-//#define IN_DEBUG_MODE
+#define IN_DEBUG_MODE
 
 volatile unsigned long meter = 0;
 volatile unsigned long meterSended = 0;
@@ -87,9 +87,15 @@ void updateFountainState(fountain_state fountainState){
   fountainStateTime = millis();
   fountainStateUpdated = fountainState;
   meter++;
-  esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
+  esp_err_t result = esp_now_send(receiverAddress, (uint8_t *)&fountainState, sizeof(fountainState));
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  }
+  else {
+    Serial.println("Error sending the data: "+result);
+  }
   #ifdef IN_DEBUG_MODE
-    Serial.println("\r\nSending completed!");
+    Serial.println("\r\nSending finished!");
   #endif
 }
 
@@ -98,7 +104,7 @@ void showDemo(){
     #ifdef IN_DEBUG_MODE
         Serial.println("\tshowDemo()");
     #endif
-    updateFountainState(Fountain::getDemoFountainState());
+    updateFountainState(Fountain::getDemoFountainState(fountainStateUpdated));
 }
 
 void processMeter(){
@@ -119,10 +125,10 @@ void setup(){
   WiFi.mode(WIFI_STA);
 
   if (esp_now_init() != ESP_OK){
-    Serial.println("Error initializing connection!");
+    Serial.println("Error initializing ESP-NOW!");
     return;
   }
-  Serial.println("successfully connected.");
+  Serial.println("successfully initialized ESP-NOW.");
 
   esp_now_register_send_cb(onDataSent);
 
@@ -132,7 +138,7 @@ void setup(){
   peerInfo.encrypt = false;
 
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
+    Serial.println("Failed to add peer: "+receiverAddress);
     return;
   }
 

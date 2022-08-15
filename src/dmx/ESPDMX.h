@@ -20,7 +20,7 @@
 
 class DMXESPSerial {
 public:
-  void init();
+  static void init();
   void init(int MaxChan, int dmxPin);
   uint8_t read(int Channel);
   void write(int channel, uint8_t value);

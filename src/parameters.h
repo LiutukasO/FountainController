@@ -5,13 +5,12 @@
 
 //#define IN_DEBUG_MODE
 
-//Receiver: ac:67:b2:2b:0e:70
-//Receiver: 10:52:1C:68:03:90 (bad)
-//Receiver: AC:67:B2:2B:0E:90 (old)
-//Receiver: 08:3A:F2:52:D6:E0 (real)
-//Sender: 10:52:1C:68:0B:8C
-//Sender: 98:41:5c:03:f2:af
-unsigned char receiverAddress[] = {0x08, 0x3A, 0xF2, 0x52, 0xD6, 0xE0};
+// RECEIVER DEMO: AC:67:B2:2B:0E:90
+unsigned char receiverAddress[] = {0xAC, 0x67, 0xB2, 0x2B, 0x0E, 0x90};
+// RECEIVER REAL: 08:3A:F2:52:D6:E0
+//unsigned char receiverAddress[] = {0x08, 0x3A, 0xF2, 0x52, 0xD6, 0xE0};
+
+// SENDER DEMO: 10:52:1C:68:0B:8C
 unsigned char senderAddress[] = {0x10, 0x52, 0x1C, 0x68, 0x0B, 0x8C};
 
 bool isValidSender(const uint8_t *mac) {
@@ -21,22 +20,22 @@ bool isValidSender(const uint8_t *mac) {
   return false;
 }
 
-unsigned char valveChannelGroup = 1; //17;
+unsigned char valveChannelGroup = 1; // +4 channels
 
 // CENTER
-unsigned char led1ChannelGroup  = 25; //5;
+unsigned char led1ChannelGroup  = 5; // +3 channels
 
 // MIDDLE
-unsigned char led2ChannelGroup  = 17;
+unsigned char led2ChannelGroup  = 8; // +3 channels
 
 // EXTERNAL
-unsigned char led3ChannelGroup  = 9;
-unsigned char led4ChannelGroup  = 13;
+unsigned char led3ChannelGroup  = 11; // +3 channels
+unsigned char led4ChannelGroup  = 14; // +3 channels
 
-unsigned long iddleTimeToDemo = 10000; // 10s
-unsigned long demoUpdateInterval = 1000; // 1s
+unsigned long iddleTimeToDemo = 1000; // 1s
+unsigned long demoUpdateInterval = 3000; // 3s
 
-unsigned char audioInputPin = 14;
+unsigned char audioInputPin = 35; //14;
 
 
 #endif

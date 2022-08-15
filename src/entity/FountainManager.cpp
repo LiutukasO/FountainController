@@ -5,7 +5,7 @@
 
 FountainManager::FountainManager(unsigned char audioPin){
     this->audioAnalyzer = new AudioAnalyzer(audioPin);
-    DMX::Initialize();
+    DMXESPSerial::init();
 }
 
 unsigned long FountainManager::getUpdateTime(){
@@ -151,6 +151,7 @@ fountain_state FountainManager::getFountainStateFromDMX(){
         Serial.println("\tFountainManager::getFountainStateFromDMX()");
     #endif
     fountain_state fountainState;
+    /*
     if (!DMX::IsHealthy()){
         #ifdef IN_DEBUG_MODE
             Serial.println("\t\tDMX::IsHealthy() == FALSE");
@@ -176,6 +177,6 @@ fountain_state FountainManager::getFountainStateFromDMX(){
     fountainState.led4State.red       = DMX::Read(50);
     fountainState.led4State.green     = DMX::Read(51);
     fountainState.led4State.blue      = DMX::Read(52);
-
+    */
    return fountainState;
 }

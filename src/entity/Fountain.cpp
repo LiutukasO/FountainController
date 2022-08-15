@@ -1,6 +1,6 @@
 #include <entity/Fountain.h>
 
-#define IN_DEBUG_MODE
+//#define IN_DEBUG_MODE
 
 Fountain::Fountain (
               unsigned char valveChannelGroup
@@ -41,14 +41,24 @@ Led * Fountain::getLed4(){
     return this->led4;
 }
 
-void Fountain::printFountainState(fountain_state fountainState){
+void Fountain::printValveState(valve_state valveState){
     #ifdef IN_DEBUG_MODE
-        Serial.printf("\n\tvalves: %d %d %d %d\n", fountainState.valveState.center, fountainState.valveState.ring1, fountainState.valveState.ring2, fountainState.valveState.ring3);
-        Serial.printf("\tled 1: %d %d %d\n", fountainState.led1State.red, fountainState.led1State.green, fountainState.led1State.blue);
-        Serial.printf("\tled 2: %d %d %d\n", fountainState.led2State.red, fountainState.led2State.green, fountainState.led2State.blue);
-        Serial.printf("\tled 3: %d %d %d\n", fountainState.led3State.red, fountainState.led3State.green, fountainState.led3State.blue);
-        Serial.printf("\tled 4: %d %d %d\n", fountainState.led4State.red, fountainState.led4State.green, fountainState.led4State.blue);
+        Serial.printf("\n\tvalves: %d %d %d %d\n", valveState.center, valveState.ring1, valveState.ring2, valveState.ring3);
     #endif
+}
+
+void Fountain::printLedState(byte ledNo, led_state ledState){
+    #ifdef IN_DEBUG_MODE
+        Serial.printf("\tled %d: %d %d %d\n", ledNo, ledState.red, ledState.green, ledState.blue);
+    #endif
+}
+
+void Fountain::printFountainState(fountain_state fountainState){
+    printValveState(fountainState.valveState);
+    printLedState(1, fountainState.led1State);
+    printLedState(2, fountainState.led2State);
+    printLedState(3, fountainState.led3State);
+    printLedState(4, fountainState.led4State);
 }
 
 String Fountain::toJson(fountain_state fountainState){
@@ -86,30 +96,53 @@ unsigned char getRandomState(){
     return rand() % 2 * 255;
 }
 
-fountain_state Fountain::getDemoFountainState(){
+
+valve_state Fountain::randomDemoValveState(){
+    valve_state newState;
+    newState.center = getRandomState();
+    newState.ring1  = getRandomState();
+    newState.ring2  = getRandomState();
+    newState.ring3  = getRandomState();
+    if (!newState.ring1 && !newState.ring2 && !newState.ring3){
+        newState.center = 255;
+    }
+    return newState;
+}
+
+led_state Fountain::randomDemoLedState(){
+    led_state newState;
+    newState.red   = getRandomState();
+    newState.green = getRandomState();
+    newState.blue  = getRandomState();
+    if (!newState.red && !newState.green && !newState.blue){
+        newState.red = 255;
+    }
+    return newState;
+}
+
+valve_state Fountain::updateDemoValveState(valve_state oldState){
+    valve_state newState;
+    newState.center = (!oldState.ring2  && oldState.ring3)  || (oldState.center && !oldState.ring1)  ? 255 : 0;
+    newState.ring1  = (!oldState.ring3  && oldState.center) || (oldState.ring1  && !oldState.ring2)  ? 255 : 0;
+    newState.ring2  = (!oldState.center && oldState.ring1)  || (oldState.ring2  && !oldState.ring3)  ? 255 : 0;
+    newState.ring3  = (!oldState.ring1  && oldState.ring2)  || (oldState.ring3  && !oldState.center) ? 255 : 0;
+    if (!newState.center && !newState.ring1 && !newState.ring2 && !newState.ring3) {
+        newState.center = 255;
+    }
+    return newState;
+}
+
+fountain_state Fountain::getDemoFountainState(fountain_state fountainState){
     #ifdef IN_DEBUG_MODE
         Serial.println("\tgetDemoFountainState()");
     #endif
-    fountain_state fountainState;
 
-    fountainState.valveState.center = rand() % 2 * 255;
-    fountainState.valveState.ring1  = rand() % 2 * 255;
-    fountainState.valveState.ring2  = rand() % 2 * 255;
-    fountainState.valveState.ring3  = rand() % 2 * 255;
-    if (!fountainState.valveState.ring1 && !fountainState.valveState.ring2 && !fountainState.valveState.ring3){
-        fountainState.valveState.center = 255;
-    }
+    //fountainState.valveState = randomDemoValveState();
+    fountainState.valveState = updateDemoValveState(fountainState.valveState);
 
     // ***** LEDs in CENTER
     if (fountainState.valveState.center){
-      fountainState.led1State.red   = getRandomState();
-      fountainState.led1State.green = getRandomState();
-      fountainState.led1State.blue  = getRandomState();
-      if (!fountainState.led1State.red && !fountainState.led1State.green && !fountainState.led1State.red){
-        fountainState.led1State.red   = 255;
-        fountainState.led1State.green = 255;
-        fountainState.led1State.blue  = 255;
-      }
+        fountainState.led1State = randomDemoLedState();
     } else {
       fountainState.led1State.red   = 0;
       fountainState.led1State.green = 0;
@@ -118,14 +151,7 @@ fountain_state Fountain::getDemoFountainState(){
 
     // ***** LEDs in RING-2
     if (fountainState.valveState.ring1){
-      fountainState.led2State.red   = getRandomState();
-      fountainState.led2State.green = getRandomState();
-      fountainState.led2State.blue  = getRandomState();
-      if (!fountainState.led2State.red && !fountainState.led2State.green && !fountainState.led2State.red){
-        fountainState.led2State.red   = 255;
-        fountainState.led2State.green = 255;
-        fountainState.led2State.blue  = 255;
-      }
+      fountainState.led2State = randomDemoLedState();
     } else {
         fountainState.led2State.red   = 0;
         fountainState.led2State.green = 0;
@@ -134,14 +160,7 @@ fountain_state Fountain::getDemoFountainState(){
 
     // ***** LEDs in RING-3
     if (fountainState.valveState.ring2){
-      fountainState.led3State.red   = getRandomState();
-      fountainState.led3State.green = getRandomState();
-      fountainState.led3State.blue  = getRandomState();
-      if (!fountainState.led3State.red && !fountainState.led3State.green && !fountainState.led3State.red){
-        fountainState.led3State.red   = 255;
-        fountainState.led3State.green = 255;
-        fountainState.led3State.blue  = 255;
-      }
+      fountainState.led3State = randomDemoLedState();
     } else {
       fountainState.led3State.red   = 0;
       fountainState.led3State.green = 0;
@@ -150,14 +169,7 @@ fountain_state Fountain::getDemoFountainState(){
 
     // ***** LEDs in RING-3
     if (fountainState.valveState.ring3){
-      fountainState.led4State.red   = getRandomState();
-      fountainState.led4State.green = getRandomState();
-      fountainState.led4State.blue  = getRandomState();
-      if (!fountainState.led4State.red && !fountainState.led4State.green && !fountainState.led4State.red){
-        fountainState.led4State.red   = 255;
-        fountainState.led4State.green = 255;
-        fountainState.led4State.blue  = 255;
-      }
+      fountainState.led4State = randomDemoLedState();
     } else {
       fountainState.led4State.red   = 0;
       fountainState.led4State.green = 0;
@@ -190,20 +202,22 @@ void Fountain::showDemo(){
     #ifdef IN_DEBUG_MODE
         //Serial.println("\tFountain::showDemo()");
     #endif
-    if (updateTime + 3000 > millis()) {
+    if (millis() - updateTime >= 3000) {
         return;
-        if (fadeTime + 20 > millis()) {
-            return;
-        }
-        fountain_state fountainState = this->fadeLeds(this->getFountainState());
-        this->updateLeds(this->getLed1(), fountainState.led1State);
-        this->updateLeds(this->getLed2(), fountainState.led2State);
-        this->updateLeds(this->getLed3(), fountainState.led3State);
-        this->updateLeds(this->getLed4(), fountainState.led4State);
-        this->fadeTime = millis();
-        return;
+        //if (millis() - fadeTime >= 20) {
+        //    return;
+        //}
+        //fountain_state fountainState = this->fadeLeds(this->getFountainState());
+        //this->updateLeds(this->getLed1(), fountainState.led1State);
+        //this->updateLeds(this->getLed2(), fountainState.led2State);
+        //this->updateLeds(this->getLed3(), fountainState.led3State);
+        //this->updateLeds(this->getLed4(), fountainState.led4State);
+        //this->fadeTime = millis();
+        //return;
     }
-    this->updateState(Fountain::getDemoFountainState());
+    this->updateState(Fountain::getDemoFountainState(this->getFountainState()));
+    this->dmx.update();
+    this->dmx.update();
 }
 
 void Fountain::updateState(fountain_state fountainState){
@@ -217,6 +231,7 @@ void Fountain::updateState(fountain_state fountainState){
     this->updateLeds(this->getLed4(), fountainState.led4State);
     this->dmx.update();
     this->updateTime = millis();
+    this->dmx.update();
 }
 
 void Fountain::updateValves(valve_state valveState){

@@ -7,12 +7,14 @@
 
 #define IN_DEBUG_MODE
 
+Fountain *fountain;
+
+/*
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
 
-Fountain *fountain;
-
 unsigned long lastReceivedTime = millis();
+fountain_state lastReceivedFountainState;
 
 void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   #ifdef IN_DEBUG_MODE
@@ -27,15 +29,11 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     return;
   }
   lastReceivedTime = millis();
-  fountain_state fountainState;
-  memcpy(&fountainState, incomingData, sizeof(fountainState));
-  fountain->updateState(fountainState);
+  memcpy(&lastReceivedFountainState, incomingData, sizeof(lastReceivedFountainState));
   events.send("fountainState", "onDataRecv", millis());
 }
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println("Fountain LED & valve controller initializing...");
+void initWiFiServer() {
   Serial.printf("ESP Board MAC Address: %s\n", WiFi.macAddress().c_str());
 
   // Set device as a Wi-Fi Station
@@ -52,19 +50,8 @@ void setup() {
     Serial.println("Error initializing connection!");
     return;
   }
-  
-  Serial.println("Fountain initializing...");
-  fountain = new Fountain(
-    valveChannelGroup
-  , led1ChannelGroup
-  , led2ChannelGroup
-  , led3ChannelGroup
-  , led4ChannelGroup
-  );
-  Serial.println("Fountain initialized.");
 
   esp_now_register_recv_cb(onDataRecv);
-
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html; charset=utf-8", index_html);
@@ -85,11 +72,32 @@ void setup() {
   });
   server.addHandler(&events);
   server.begin();
-  
+}
+*/
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Fountain LED & valve controller initializing...");
+
+  Serial.println("Fountain initializing...");
+  fountain = new Fountain(
+    valveChannelGroup
+  , led1ChannelGroup
+  , led2ChannelGroup
+  , led3ChannelGroup
+  , led4ChannelGroup
+  );
+  Serial.println("Fountain initialized.");
+
+  //initWiFiServer();
+
   Serial.println("Fountain LED & valve controller initialized");
 }
  
 void loop() {
-  if (lastReceivedTime + iddleTimeToDemo > millis()) return;
+  //if (lastReceivedTime + iddleTimeToDemo > millis()) {
+      //fountain->updateState(lastReceivedFountainState);
+  //    return;
+  //}
   fountain->showDemo();
 }

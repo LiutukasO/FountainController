@@ -3,7 +3,7 @@
 
 #include <entity/Fountain.h>
 #include <entity/AudioAnalyzer.h>
-#include <dmx/dmx.h>
+#include <dmx/ESPDMX.h>
 
 class FountainManager
 {
@@ -11,6 +11,7 @@ class FountainManager
         FountainManager (unsigned char audioPin);
 
         unsigned long getUpdateTime();
+        //fountain_state getFountainStateDemo();
         fountain_state getFountainStateFromAudio();
         fountain_state getFountainStateFromDMX();
 
@@ -40,7 +41,7 @@ class FountainManager
         unsigned long updateTime = 0;
 
         bool audioConnected = false;
-        bool dmxConnected = true;
+        bool dmxConnected = false;
 
         bool ledTurnedOn = true;
         bool valvesTurnedOn = true;
