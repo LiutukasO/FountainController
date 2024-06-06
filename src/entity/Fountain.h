@@ -21,10 +21,11 @@ class Fountain
         static void printLedState(byte ledNo, led_state ledState);
         static void printFountainState(fountain_state fountainState);
         static String toJson(fountain_state fountainState);
-        static led_state Fountain::randomDemoLedState();
+        static led_state randomDemoLedState();
         static valve_state randomDemoValveState();
         static valve_state updateDemoValveState(valve_state valveState);
         static fountain_state getDemoFountainState(fountain_state fountainState);
+        static fountain_state getDemoLedState(fountain_state fountainState);
         static fountain_state fadeLeds(fountain_state fountainState);
         Fountain (
               unsigned char valveChannelGroup
@@ -40,6 +41,7 @@ class Fountain
         Led * getLed3();
         Led * getLed4();
 
+        void initConnections();
         void showDemo();
         void updateState(fountain_state fountainState);
         unsigned long getUpdateTime();

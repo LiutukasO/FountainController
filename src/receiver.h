@@ -5,7 +5,7 @@
 #include <parameters.h>
 #include <receiver_index.h>
 
-#define IN_DEBUG_MODE
+//#define IN_DEBUG_MODE
 
 Fountain *fountain;
 
@@ -76,10 +76,10 @@ void initWiFiServer() {
 */
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("Fountain LED & valve controller initializing...");
+  //Serial.begin(115200);
+  //Serial.println("Fountain LED & valve controller initializing...");
 
-  Serial.println("Fountain initializing...");
+  //Serial.println("Fountain initializing...");
   fountain = new Fountain(
     valveChannelGroup
   , led1ChannelGroup
@@ -87,17 +87,18 @@ void setup() {
   , led3ChannelGroup
   , led4ChannelGroup
   );
-  Serial.println("Fountain initialized.");
+  //Serial.println("Fountain initialized.");
 
   //initWiFiServer();
 
-  Serial.println("Fountain LED & valve controller initialized");
+  //Serial.println("Fountain LED & valve controller initialized");
 }
  
 void loop() {
   //if (lastReceivedTime + iddleTimeToDemo > millis()) {
       //fountain->updateState(lastReceivedFountainState);
-  //    return;
+      //return;
   //}
   fountain->showDemo();
+  //fountain->initConnections();
 }

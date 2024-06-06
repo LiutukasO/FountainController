@@ -139,6 +139,15 @@ fountain_state Fountain::getDemoFountainState(fountain_state fountainState){
 
     //fountainState.valveState = randomDemoValveState();
     fountainState.valveState = updateDemoValveState(fountainState.valveState);
+    fountainState = getDemoLedState(fountainState);
+
+    return fountainState;
+}
+
+fountain_state Fountain::getDemoLedState(fountain_state fountainState){
+    #ifdef IN_DEBUG_MODE
+        Serial.println("\tgetDemoLedState()");
+    #endif
 
     // ***** LEDs in CENTER
     if (fountainState.valveState.center){
@@ -149,8 +158,8 @@ fountain_state Fountain::getDemoFountainState(fountain_state fountainState){
       fountainState.led1State.blue  = 0;
     }
 
-    // ***** LEDs in RING-2
-    if (fountainState.valveState.ring1){
+    // ***** LEDs in RING-1
+    if (fountainState.valveState.ring1 || fountainState.valveState.ring2){
       fountainState.led2State = randomDemoLedState();
     } else {
         fountainState.led2State.red   = 0;
@@ -158,8 +167,8 @@ fountain_state Fountain::getDemoFountainState(fountain_state fountainState){
         fountainState.led2State.blue  = 0;
     }
 
-    // ***** LEDs in RING-3
-    if (fountainState.valveState.ring2){
+    // ***** LEDs in RING-2
+    if (fountainState.valveState.ring2 || fountainState.valveState.ring3){
       fountainState.led3State = randomDemoLedState();
     } else {
       fountainState.led3State.red   = 0;
@@ -168,7 +177,7 @@ fountain_state Fountain::getDemoFountainState(fountain_state fountainState){
     }
 
     // ***** LEDs in RING-3
-    if (fountainState.valveState.ring3){
+    if (fountainState.valveState.ring2 || fountainState.valveState.ring3){
       fountainState.led4State = randomDemoLedState();
     } else {
       fountainState.led4State.red   = 0;
@@ -198,22 +207,155 @@ fountain_state Fountain::fadeLeds(fountain_state fountainState){
     return fountainState;
 }
 
+void Fountain::initConnections(){
+    if (millis() - updateTime < 10000) {
+        return;
+    }
+
+    fountain_state fountainState = this->getFountainState();
+    if (fountainState.valveState.center == 0 &&
+        fountainState.valveState.ring1  == 0 &&
+        fountainState.valveState.ring2  == 0 &&
+        fountainState.valveState.ring3  == 0
+    ){
+        fountainState.valveState.ring3 = 255;
+    }
+
+    if (fountainState.valveState.ring3) {
+        fountainState.valveState.center = 255;
+        fountainState.valveState.ring1 = 0;
+        fountainState.valveState.ring2 = 0;
+        fountainState.valveState.ring3 = 0;
+
+        fountainState.led1State.red   = 255;
+        fountainState.led1State.green = 255;
+        fountainState.led1State.blue  = 255;
+
+        fountainState.led2State.red   = 0;
+        fountainState.led2State.green = 0;
+        fountainState.led2State.blue  = 0;
+
+        fountainState.led3State.red   = 0;
+        fountainState.led3State.green = 0;
+        fountainState.led3State.blue  = 0;
+
+        fountainState.led4State.red   = 0;
+        fountainState.led4State.green = 0;
+        fountainState.led4State.blue  = 0;
+
+        this->updateState(fountainState);
+        this->dmx.update();
+        this->dmx.update();
+        return;
+    }
+
+
+    if (fountainState.valveState.center) {
+        fountainState.valveState.center = 0;
+        fountainState.valveState.ring1  = 255;
+        fountainState.valveState.ring2  = 0;
+        fountainState.valveState.ring3  = 0;
+
+        fountainState.led1State.red   = 0;
+        fountainState.led1State.green = 0;
+        fountainState.led1State.blue  = 0;
+
+        fountainState.led2State.red   = 255;
+        fountainState.led2State.green = 255;
+        fountainState.led2State.blue  = 255;
+
+        fountainState.led3State.red   = 0;
+        fountainState.led3State.green = 0;
+        fountainState.led3State.blue  = 0;
+
+        fountainState.led4State.red   = 0;
+        fountainState.led4State.green = 0;
+        fountainState.led4State.blue  = 0;
+
+        this->updateState(fountainState);
+        this->dmx.update();
+        this->dmx.update();
+        return;
+    }
+
+    if (fountainState.valveState.ring1) {
+        fountainState.valveState.center = 0;
+        fountainState.valveState.ring1  = 0;
+        fountainState.valveState.ring2  = 255;
+        fountainState.valveState.ring3  = 0;
+
+        fountainState.led1State.red   = 0;
+        fountainState.led1State.green = 0;
+        fountainState.led1State.blue  = 0;
+
+        fountainState.led2State.red   = 0;
+        fountainState.led2State.green = 0;
+        fountainState.led2State.blue  = 0;
+
+        fountainState.led3State.red   = 255;
+        fountainState.led3State.green = 255;
+        fountainState.led3State.blue  = 255;
+
+        fountainState.led4State.red   = 255;
+        fountainState.led4State.green = 255;
+        fountainState.led4State.blue  = 255;
+
+        this->updateState(fountainState);
+        this->dmx.update();
+        this->dmx.update();
+        return;
+    }
+
+
+    if (fountainState.valveState.ring2) {
+        fountainState.valveState.center = 0;
+        fountainState.valveState.ring1  = 0;
+        fountainState.valveState.ring2  = 0;
+        fountainState.valveState.ring3  = 255;
+
+        fountainState.led1State.red   = 0;
+        fountainState.led1State.green = 0;
+        fountainState.led1State.blue  = 0;
+
+        fountainState.led2State.red   = 0;
+        fountainState.led2State.green = 0;
+        fountainState.led2State.blue  = 0;
+
+        fountainState.led3State.red   = 255;
+        fountainState.led3State.green = 255;
+        fountainState.led3State.blue  = 255;
+
+        fountainState.led4State.red   = 255;
+        fountainState.led4State.green = 255;
+        fountainState.led4State.blue  = 255;
+
+        this->updateState(fountainState);
+        this->dmx.update();
+        this->dmx.update();
+        return;
+    }
+
+}
+
 void Fountain::showDemo(){
     #ifdef IN_DEBUG_MODE
         //Serial.println("\tFountain::showDemo()");
     #endif
-    if (millis() - updateTime >= 3000) {
-        return;
-        //if (millis() - fadeTime >= 20) {
-        //    return;
-        //}
-        //fountain_state fountainState = this->fadeLeds(this->getFountainState());
-        //this->updateLeds(this->getLed1(), fountainState.led1State);
-        //this->updateLeds(this->getLed2(), fountainState.led2State);
-        //this->updateLeds(this->getLed3(), fountainState.led3State);
-        //this->updateLeds(this->getLed4(), fountainState.led4State);
-        //this->fadeTime = millis();
+    if (millis() - updateTime < 3000) {
         //return;
+        if (millis() - fadeTime <= 2000) {
+            return;
+        }
+        fountain_state fountainState = this->fadeLeds(this->getFountainState());
+        fountainState = getDemoLedState(fountainState);
+        this->updateLeds(this->getLed1(), fountainState.led1State);
+        this->updateLeds(this->getLed2(), fountainState.led2State);
+        this->updateLeds(this->getLed3(), fountainState.led3State);
+        this->updateLeds(this->getLed4(), fountainState.led4State);
+        this->dmx.update();
+        this->fadeTime = millis();
+        this->dmx.update();
+        return;
     }
     this->updateState(Fountain::getDemoFountainState(this->getFountainState()));
     this->dmx.update();
