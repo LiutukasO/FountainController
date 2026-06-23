@@ -129,6 +129,9 @@ valve_state Fountain::updateDemoValveState(valve_state oldState){
     if (!newState.center && !newState.ring1 && !newState.ring2 && !newState.ring3) {
         newState.center = 255;
     }
+    if(newState.ring1) {
+        newState.center = 0;
+    }
     return newState;
 }
 
@@ -150,7 +153,7 @@ fountain_state Fountain::getDemoLedState(fountain_state fountainState){
     #endif
 
     // ***** LEDs in CENTER
-    if (fountainState.valveState.center){
+    if (fountainState.valveState.center || (fountainState.valveState.ring1 && !fountainState.valveState.ring2)){
         fountainState.led1State = randomDemoLedState();
     } else {
       fountainState.led1State.red   = 0;
@@ -177,7 +180,7 @@ fountain_state Fountain::getDemoLedState(fountain_state fountainState){
     }
 
     // ***** LEDs in RING-3
-    if (fountainState.valveState.ring2 || fountainState.valveState.ring3){
+    if (fountainState.valveState.center || fountainState.valveState.ring2 || fountainState.valveState.ring3){
       fountainState.led4State = randomDemoLedState();
     } else {
       fountainState.led4State.red   = 0;
@@ -341,9 +344,9 @@ void Fountain::showDemo(){
     #ifdef IN_DEBUG_MODE
         //Serial.println("\tFountain::showDemo()");
     #endif
-    if (millis() - updateTime < 3000) {
+    if (millis() - this->updateTime < this->valveTime) {
         //return;
-        if (millis() - fadeTime <= 2000) {
+        if (millis() - this->fadeTime <= 2000) {
             return;
         }
         fountain_state fountainState = this->fadeLeds(this->getFountainState());
@@ -373,6 +376,11 @@ void Fountain::updateState(fountain_state fountainState){
     this->updateLeds(this->getLed4(), fountainState.led4State);
     this->dmx.update();
     this->updateTime = millis();
+    if (fountainState.valveState.center) {
+        this->valveTime = 8000;
+    } else {
+        this->valveTime = 4000;
+    }
     this->dmx.update();
 }
 

@@ -50,6 +50,7 @@ class Fountain
     private:
         unsigned long updateTime = 0;
         unsigned long fadeTime = 0;
+        unsigned long valveTime = 4000;
 
         Valves *valves;
         Led *led1;
