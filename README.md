@@ -1,51 +1,124 @@
 # Fountain Controller
-The fountain has three controlled currents and 4 RGB LED groups. 4 Lamps in each group.
-All this is controlled by two modules: Receiver and Sender. They communicate over a WiFi connection.
 
-## Receiver
-Receiver control water valves and LEDs using multiple relays by received commands from "Sender".
-The Receiver can perform the Demo program on its own. Demo program automatically activating If 10 seconds does not receive data from the Sender module.
+Fontanas valdomas per **DMX512**: ESP32 (receiver) siunčia DMX komandas per RS485 į dekoderius, kurie valdo vandens vožtuvus ir RGB LED grupes.
 
-## Sender
-Sender has multiple functions:
-* User can connect audio signal to this box. Program convert audio signal to LED & Valves statuses. Audio conversion will be done by [Furje transformation](https://en.wikipedia.org/wiki/Fourier_transform).
-* Turn On/Off Led lamps during day lights
-* User can manually switch between different Demo program settings.
+Antras modulis — **Sender** (ESP32) — gali siųsti komandas per **ESP-NOW** (WiFi), bet pats fontanas reaguoja per DMX magistralę.
 
+## Projekto struktūra
 
-## Connections diagram
+| Failas / modulis | Paskirtis |
+|------------------|-----------|
+| `src/receiver.h` + `main.cpp` | DMX receiver — valdo fontaną per dekoderius |
+| `src/sender.h` | ESP-NOW siuntėjas (garso analizė, demo) |
+| `src/dmx/ESPDMX.cpp` | DMX512 siuntimas (esp_dmx biblioteka) |
+| `src/parameters.h` | Kanalų grupės, MAC adresai |
 
-| ESP32 | 4 Relay | Connector |    Description       |
-|-------|---------|-----------|----------------------|
-|  D2   |    R1   |           | 12V - LEDs Flush     |
-|       |         |   H2O 4   |  0V - Ground         |
-|  D14  |    R2   |   H2O 3   | 12V - External valve |
-|  D13  |    R3   |   H2O 2   | 12V - Inner valve    |
-|  D15  |    R4   |   H2O 1   | 12V - Center valve   |
+**PlatformIO aplinka:** `esp32doit-devkit-v1`
 
-| ESP32 | Bottom 8 SSR | Connector |    Wired     | Description |
-|-------|--------------|-----------|--------------|-------------|
-|       |      R1      |           |              |             |
-|       |      R2      |           |              |             |
-|  D27  |      R3      |   2LED 1  |  0V - Red    |  External   |
-|  D26  |      R4      |   2LED 2  |  0V - Green  |  External   |
-|  D25  |      R5      |   2LED 3  |  0V - Blue   |  External   |
-|       |              |   2LED 4  | 12V - Power  |  External   |
-|  D23  |      R6      |   1LED 1  |  0V - Red    |  External   |
-|  D22  |      R7      |   1LED 2  |  0V - Green  |  External   |
-|  D33  |      R8      |   1LED 3  |  0V - Blue   |  External   |
-|       |              |   1LED 4  | 12V - Power  |  External   |
+```bash
+pio run -e esp32doit-devkit-v1
+pio run -e esp32doit-devkit-v1 -t upload
+```
 
+---
 
-| ESP32 |  Top 8 SSR   | Connector |    Wired     | Description |
-|-------|--------------|-----------|--------------|-------------|
-|       |      R1      |           |              |             |
-|       |      R2      |           |              |             |
-|  D4   |      R3      |   4LED 1  |  0V - Red    |  Inner      |
-|  D5   |      R4      |   4LED 2  |  0V - Green  |  Inner      |
-|  D8   |      R5      |   4LED 3  |  0V - Blue   |  Inner      |
-|       |              |   4LED 4  | 12V - Power  |  Inner      |
-|       |              |   3LED 4  | 12V - Power  |  Center     |
-|  D19  |      R6      |   3LED 3  |  0V - Blue   |  Center     |
-|  D21  |      R7      |   3LED 2  |  0V - Green  |  Center     |
-|  D22  |      R8      |   3LED 1  |  0V - Red    |  Center     |
+## DMX kanalų žemėlapis
+
+Programa siunčia reikšmes į **kanalus 1–16** (likę kanalai 17–512 = 0). Nustatymai faile `src/parameters.h`:
+
+| DMX kanalas | Paskirtis | Reikšmė |
+|-------------|-----------|---------|
+| **1** | Vožtuvas — center | 0 = OFF, 255 = ON |
+| **2** | Vožtuvas — ring1 | 0 / 255 |
+| **3** | Vožtuvas — ring2 | 0 / 255 |
+| **4** | Vožtuvas — ring3 | 0 / 255 |
+| **5** | LED1 (center) — R | 0–255 |
+| **6** | LED1 — G | 0–255 |
+| **7** | LED1 — B | 0–255 |
+| **8** | LED2 (middle) — R | 0–255 |
+| **9** | LED2 — G | 0–255 |
+| **10** | LED2 — B | 0–255 |
+| **11** | LED3 (external) — R | 0–255 |
+| **12** | LED3 — G | 0–255 |
+| **13** | LED3 — B | 0–255 |
+| **14** | LED4 (external) — R | 0–255 |
+| **15** | LED4 — G | 0–255 |
+| **16** | LED4 — B | 0–255 |
+
+---
+
+## ESP32 → RS485 → DMX jungtis
+
+```
+ESP32 GPIO4  ──►  RS485 DI
+ESP32 3.3V   ──►  RS485 DE + RE (sujungti kartu, nuolatinis siuntimo režimas)
+RS485 A, B   ──►  DMX dekoderiai (daisy-chain)
+RS485 GND    ──►  Bendras GND su dekoderiais
+```
+
+| RS485 / XLR | Signalas |
+|-------------|----------|
+| GND (XLR 1) | Bendra masa |
+| A (XLR 3 / Data+) | DMX+ |
+| B (XLR 2 / Data−) | DMX− |
+
+Debug: `src/dmx/ESPDMX.cpp` faile atkomentuokite `#define DMX_TRACE` — Serial Monitor rodys kanalus 1–16 kiekvieno siuntimo metu.
+
+---
+
+## DMX dekoderių adresų (DIP) konfigūracija
+
+Dekoderio **1-as išėjimas** klauso DMX kanalo, kurį nurodo **adreso DIP jungikliai**.  
+Kiti išėjimai eina iš eilės: 2-as išėjimas = startinis kanalas + 1, ir t.t.
+
+Tipinis skaičiavimas (Decoder512, 30 kanalų ir panašūs):
+
+```
+Startinis DMX kanalas = 1 + (DIP1×1 + DIP2×2 + DIP3×4 + DIP4×8 + DIP5×16 + …)
+```
+
+### Du atskiri dekoderiai (rekomenduojama schema)
+
+| Dekoderis | Kanalų sk. | Paskirtis | Startinis kanalas | DIP (1+2+4+8+16…) |
+|-----------|------------|-----------|-------------------|-------------------|
+| **#1** | 4 | Vožtuvai | **1** | Visos **OFF** |
+| **#2** | 16 | LED RGB | **5** | Tik **3** svirtis ON (reikšmė 4 → 1+4=**5**) |
+
+**Vožtuvų dekoderis (adresas 1):**
+
+| Dekoderio išėjimas | DMX kanalas | Vožtuvas |
+|--------------------|-------------|----------|
+| OUT 1 | 1 | Center |
+| OUT 2 | 2 | Ring1 |
+| OUT 3 | 3 | Ring2 |
+| OUT 4 | 4 | Ring3 |
+
+**LED dekoderis (adresas 5):**
+
+| Dekoderio išėjimas | DMX kanalas | LED |
+|--------------------|-------------|-----|
+| OUT 1 | 5 | LED1 R |
+| OUT 2 | 6 | LED1 G |
+| OUT 3 | 7 | LED1 B |
+| OUT 4 | 8 | LED2 R |
+| OUT 5 | 9 | LED2 G |
+| OUT 6 | 10 | LED2 B |
+| OUT 7 | 11 | LED3 R |
+| OUT 8 | 12 | LED3 G |
+| OUT 9 | 13 | LED3 B |
+| OUT 10 | 14 | LED4 R |
+| OUT 11 | 15 | LED4 G |
+| OUT 12 | 16 | LED4 B |
+| OUT 13–16 | 17–20 | nenaudojami (lieka 0) |
+
+#### DIP lentelė startiniam kanalui 5
+
+(Standartinė binary schema: DIP1=1, DIP2=2, DIP3=4, DIP4=8, DIP5=16)
+
+| Startinis kanalas | DIP1 (1) | DIP2 (2) | DIP3 (4) | DIP4 (8) | DIP5 (16) |
+|-------------------|----------|----------|----------|----------|-----------|
+| **1** | OFF | OFF | OFF | OFF | OFF |
+| **5** | OFF | OFF | **ON** | OFF | OFF |
+| **17** | OFF | OFF | OFF | OFF | **ON** |
+
+> **Pastaba:** skirtingų gamintojų plokštės gali turėti skirtingą jungiklių numeraciją ant korpus. Visada tikrinkite silkscreen užrašą **1, 2, 4, 8…** ant pačios plokštės.

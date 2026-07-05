@@ -14,7 +14,7 @@ typedef struct valve_state {
 class Valves
 {
     public:
-        Valves (DMXESPSerial *dmx, unsigned char channelGroup);
+        Valves(DMXESPSerial *dmx, unsigned char channelGroup);
 
         unsigned long getUpdateTime();
         valve_state getState();

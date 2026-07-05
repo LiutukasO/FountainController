@@ -18,7 +18,6 @@ Led::Led (DMXESPSerial *dmx, unsigned char channelGroup){
     this->blueState = MIN_DUTY_CYCLE;
     this->dmx->write(this->blueChannel, this->blueState);
 
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -42,7 +41,6 @@ void Led::setRedState(unsigned char state){
     #endif
     this->redState = state;
     this->dmx->write(this->redChannel, this->redState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -60,7 +58,6 @@ void Led::turnOnRed(){
     if (this->redState == MAX_DUTY_CYCLE) return;
     this->redState = MAX_DUTY_CYCLE;
     this->dmx->write(this->redChannel, this->redState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -71,7 +68,6 @@ void Led::turnOffRed(){
     if (this->redState == MIN_DUTY_CYCLE) return;
     this->redState = MIN_DUTY_CYCLE;
     this->dmx->write(this->redChannel, this->redState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -81,7 +77,6 @@ void Led::togleRed(){
     #endif
     this->redState = 255 - this->redState;
     this->dmx->write(this->redChannel, this->redState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -94,7 +89,6 @@ void Led::setGreenState(unsigned char state){
     #endif
     this->greenState = state;
     this->dmx->write(this->greenChannel, this->greenState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -112,7 +106,6 @@ void Led::turnOnGreen(){
     if (this->greenState == MAX_DUTY_CYCLE) return;
     this->greenState = MAX_DUTY_CYCLE;
     this->dmx->write(this->greenChannel, this->greenState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -123,7 +116,6 @@ void Led::turnOffGreen(){
     if (this->greenState == MIN_DUTY_CYCLE) return;
     this->greenState = MIN_DUTY_CYCLE;
     this->dmx->write(this->greenChannel, this->greenState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -133,7 +125,6 @@ void Led::togleGreen(){
     #endif
     this->greenState = 255 - this->greenState;
     this->dmx->write(this->greenChannel, this->greenState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -146,7 +137,6 @@ void Led::setBlueState(unsigned char state){
     #endif
     this->blueState = state;
     this->dmx->write(this->blueChannel, this->blueState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -164,7 +154,6 @@ void Led::turnOnBlue(){
     if (this->blueState == MAX_DUTY_CYCLE) return;
     this->blueState = MAX_DUTY_CYCLE;
     this->dmx->write(this->blueChannel, this->blueState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -175,7 +164,6 @@ void Led::turnOffBlue(){
     if (this->blueState == MIN_DUTY_CYCLE) return;
     this->blueState = MIN_DUTY_CYCLE;
     this->dmx->write(this->blueChannel, this->blueState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -185,6 +173,5 @@ void Led::togleBlue(){
     #endif
     this->blueState = 255 - this->blueState;
     this->dmx->write(this->blueChannel, this->blueState);
-    this->dmx->update();
     this->updateTime = millis();
 }

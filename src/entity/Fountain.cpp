@@ -15,6 +15,7 @@ Fountain::Fountain (
     this->led2 = new Led(&this->dmx, led2ChannelGroup);
     this->led3 = new Led(&this->dmx, led3ChannelGroup);
     this->led4 = new Led(&this->dmx, led4ChannelGroup);
+    this->dmx.transmit();
 }
 
 unsigned long Fountain::getUpdateTime(){
@@ -247,8 +248,6 @@ void Fountain::initConnections(){
         fountainState.led4State.blue  = 0;
 
         this->updateState(fountainState);
-        this->dmx.update();
-        this->dmx.update();
         return;
     }
 
@@ -276,8 +275,6 @@ void Fountain::initConnections(){
         fountainState.led4State.blue  = 0;
 
         this->updateState(fountainState);
-        this->dmx.update();
-        this->dmx.update();
         return;
     }
 
@@ -304,8 +301,6 @@ void Fountain::initConnections(){
         fountainState.led4State.blue  = 255;
 
         this->updateState(fountainState);
-        this->dmx.update();
-        this->dmx.update();
         return;
     }
 
@@ -333,8 +328,6 @@ void Fountain::initConnections(){
         fountainState.led4State.blue  = 255;
 
         this->updateState(fountainState);
-        this->dmx.update();
-        this->dmx.update();
         return;
     }
 
@@ -355,14 +348,11 @@ void Fountain::showDemo(){
         this->updateLeds(this->getLed2(), fountainState.led2State);
         this->updateLeds(this->getLed3(), fountainState.led3State);
         this->updateLeds(this->getLed4(), fountainState.led4State);
-        this->dmx.update();
+        this->dmx.transmit();
         this->fadeTime = millis();
-        this->dmx.update();
         return;
     }
     this->updateState(Fountain::getDemoFountainState(this->getFountainState()));
-    this->dmx.update();
-    this->dmx.update();
 }
 
 void Fountain::updateState(fountain_state fountainState){
@@ -374,14 +364,14 @@ void Fountain::updateState(fountain_state fountainState){
     this->updateLeds(this->getLed2(), fountainState.led2State);
     this->updateLeds(this->getLed3(), fountainState.led3State);
     this->updateLeds(this->getLed4(), fountainState.led4State);
-    this->dmx.update();
+    this->dmx.transmit();
+
     this->updateTime = millis();
     if (fountainState.valveState.center) {
         this->valveTime = 8000;
     } else {
         this->valveTime = 4000;
     }
-    this->dmx.update();
 }
 
 void Fountain::updateValves(valve_state valveState){

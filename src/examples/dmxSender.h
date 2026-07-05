@@ -23,6 +23,6 @@ void setup()
 
 void loop()
 {
-  dmx.update();
+  dmx.transmit();
   delay(5);
 }

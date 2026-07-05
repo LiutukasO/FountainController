@@ -1,9 +1,7 @@
-#include <esp_now.h>
-#include <WiFi.h>
-#include <ESPAsyncWebServer.h>
+//#include <ESPAsyncWebServer.h>
 #include <entity/Fountain.h>
 #include <parameters.h>
-#include <receiver_index.h>
+//#include <receiver_index.h>
 
 //#define IN_DEBUG_MODE
 
@@ -76,10 +74,9 @@ void initWiFiServer() {
 */
 
 void setup() {
-  //Serial.begin(115200);
-  //Serial.println("Fountain LED & valve controller initializing...");
+  Serial.begin(115200);
+  Serial.println("Fountain LED & valve controller initializing...");
 
-  //Serial.println("Fountain initializing...");
   fountain = new Fountain(
     valveChannelGroup
   , led1ChannelGroup
@@ -87,18 +84,10 @@ void setup() {
   , led3ChannelGroup
   , led4ChannelGroup
   );
-  //Serial.println("Fountain initialized.");
 
-  //initWiFiServer();
-
-  //Serial.println("Fountain LED & valve controller initialized");
+  Serial.println("Fountain LED & valve controller initialized");
 }
  
 void loop() {
-  //if (lastReceivedTime + iddleTimeToDemo > millis()) {
-      //fountain->updateState(lastReceivedFountainState);
-      //return;
-  //}
-  fountain->showDemo();
-  //fountain->initConnections();
+  fountain->initConnections();
 }

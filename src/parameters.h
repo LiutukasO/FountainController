@@ -20,17 +20,17 @@ bool isValidSender(const uint8_t *mac) {
   return false;
 }
 
-unsigned char valveChannelGroup = 1; // +4 channels
+unsigned char valveChannelGroup = 1; // channels 1-4
 
 // CENTER
-unsigned char led1ChannelGroup  = 5; // +3 channels
+unsigned char led1ChannelGroup = 5; // channels 5-7
 
 // MIDDLE
-unsigned char led2ChannelGroup  = 8; // +3 channels
+unsigned char led2ChannelGroup = 8; // channels 8-10
 
 // EXTERNAL
-unsigned char led3ChannelGroup  = 11; // +3 channels
-unsigned char led4ChannelGroup  = 14; // +3 channels
+unsigned char led3ChannelGroup = 11; // channels 11-13
+unsigned char led4ChannelGroup = 14; // channels 14-16
 
 unsigned long iddleTimeToDemo = 1000; // 1s
 unsigned long demoUpdateInterval = 3000; // 3s

@@ -27,7 +27,7 @@ class Fountain
         static fountain_state getDemoFountainState(fountain_state fountainState);
         static fountain_state getDemoLedState(fountain_state fountainState);
         static fountain_state fadeLeds(fountain_state fountainState);
-        Fountain (
+        Fountain(
               unsigned char valveChannelGroup
             , unsigned char led1ChannelGroup
             , unsigned char led2ChannelGroup

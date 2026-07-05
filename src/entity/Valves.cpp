@@ -26,7 +26,6 @@ Valves::Valves (DMXESPSerial *dmx, unsigned char channelGroup){
     this->dmx->write(this->ring3Channel, this->ring3State);
     Serial.printf("\n\t\tRing3 valve channel: %d", this->ring3Channel);
 
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -59,7 +58,6 @@ void Valves::setCenterState(unsigned char state){
     #endif
     this->centerState = state;
     this->dmx->write(this->centerChannel, this->centerState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -77,7 +75,6 @@ void Valves::turnOnCenter(){
     if (this->centerState == MAX_DUTY_CYCLE) return;
     this->centerState = MAX_DUTY_CYCLE;
     this->dmx->write(this->centerChannel, this->centerState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -88,7 +85,6 @@ void Valves::turnOffCenter(){
     if (this->centerState == MIN_DUTY_CYCLE) return;
     this->centerState = MIN_DUTY_CYCLE;
     this->dmx->write(this->centerChannel, this->centerState);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -97,8 +93,7 @@ void Valves::togleCenter(){
         Serial.println("\t\tValves::togleCenter()");
     #endif
     this->centerState = 255 - this->centerState;
-    this->dmx->write(this->centerState, this->centerState);
-    this->dmx->update();
+    this->dmx->write(this->centerChannel, this->centerState);
     this->updateTime = millis();
 }
 
@@ -111,7 +106,6 @@ void Valves::setRing1State(unsigned char state){
     #endif
     this->ring1State = state;
     this->dmx->write(this->ring1Channel, this->ring1State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -129,7 +123,6 @@ void Valves::turnOnRing1(){
     if (this->ring1State == MAX_DUTY_CYCLE) return;
     this->ring1State = MAX_DUTY_CYCLE;
     this->dmx->write(this->ring1Channel, this->ring1State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -140,7 +133,6 @@ void Valves::turnOffRing1(){
     if (this->ring1State == MIN_DUTY_CYCLE) return;
     this->ring1State = MIN_DUTY_CYCLE;
     this->dmx->write(this->ring1Channel, this->ring1State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -150,7 +142,6 @@ void Valves::togleRing1(){
     #endif
     this->ring1State = 255 - this->ring1State;
     this->dmx->write(this->ring1Channel, this->ring1State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -163,7 +154,6 @@ void Valves::setRing2State(unsigned char state){
     #endif
     this->ring2State = state;
     this->dmx->write(this->ring2Channel, this->ring2State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -181,7 +171,6 @@ void Valves::turnOnRing2(){
     if (this->ring2State == MAX_DUTY_CYCLE) return;
     this->ring2State = MAX_DUTY_CYCLE;
     this->dmx->write(this->ring2Channel, this->ring2State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -192,7 +181,6 @@ void Valves::turnOffRing2(){
     if (this->ring2State == MIN_DUTY_CYCLE) return;
     this->ring2State = MIN_DUTY_CYCLE;
     this->dmx->write(this->ring2Channel, this->ring2State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -202,7 +190,6 @@ void Valves::togleRing2(){
     #endif
     this->ring2State = 255 - this->ring2State;
     this->dmx->write(this->ring2Channel, this->ring2State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -215,7 +202,6 @@ void Valves::setRing3State(unsigned char state){
     #endif
     this->ring3State = state;
     this->dmx->write(this->ring3Channel, this->ring3State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -233,7 +219,6 @@ void Valves::turnOnRing3(){
     if (this->ring3State == MAX_DUTY_CYCLE) return;
     this->ring3State = MAX_DUTY_CYCLE;
     this->dmx->write(this->ring3Channel, this->ring3State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -244,7 +229,6 @@ void Valves::turnOffRing3(){
     if (this->ring3State == MIN_DUTY_CYCLE) return;
     this->ring3State = MIN_DUTY_CYCLE;
     this->dmx->write(this->ring3Channel, this->ring3State);
-    this->dmx->update();
     this->updateTime = millis();
 }
 
@@ -254,6 +238,5 @@ void Valves::togleRing3(){
     #endif
     this->ring3State = 255 - this->ring3State;
     this->dmx->write(this->ring3Channel, this->ring3State);
-    this->dmx->update();
     this->updateTime = millis();
 }

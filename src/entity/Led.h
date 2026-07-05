@@ -13,7 +13,7 @@ typedef struct led_state {
 class Led
 {
     public:
-        Led (DMXESPSerial *dmx, unsigned char channelGroup);
+        Led(DMXESPSerial *dmx, unsigned char channelGroup);
 
         led_state getState();
 

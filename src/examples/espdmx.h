@@ -20,7 +20,7 @@ void loop() {
 
   for (int channel = 0; channel < 16; channel++)
   {
-    dmx.update();
+    dmx.transmit();
     int value = dmx.read(channel);
     Serial.printf("Channel %d: %d\n", channel, value);
   }
