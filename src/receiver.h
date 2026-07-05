@@ -7,6 +7,9 @@
 
 Fountain *fountain;
 
+const unsigned long INIT_CONNECTIONS_DURATION_MS = 60000;
+unsigned long receiverStartTime;
+
 /*
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
@@ -85,9 +88,14 @@ void setup() {
   , led4ChannelGroup
   );
 
+  receiverStartTime = millis();
   Serial.println("Fountain LED & valve controller initialized");
 }
  
 void loop() {
-  fountain->initConnections();
+  if (millis() - receiverStartTime < INIT_CONNECTIONS_DURATION_MS) {
+    fountain->initConnections();
+  } else {
+    fountain->showDemo();
+  }
 }
